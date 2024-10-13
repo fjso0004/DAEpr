@@ -12,9 +12,15 @@ public class Usuario {
     @Pattern(regexp = ExprReg.DNI)
     String dni;
 
+    @NotBlank
     String nombre;
+
+    @NotBlank
     String apellidos;
+
+    @NotBlank
     String direccion;
+
     String tlf;
     String email;
 
