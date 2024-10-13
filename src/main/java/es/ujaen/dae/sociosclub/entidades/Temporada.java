@@ -19,7 +19,6 @@ public class Temporada {
         actividad.setTemporada(this);
     }
 
-
     public int getAno() {
         return ano;
     }
