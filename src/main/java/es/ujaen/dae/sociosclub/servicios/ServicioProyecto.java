@@ -1,5 +1,6 @@
 package es.ujaen.dae.sociosclub.servicios;
 
+import es.ujaen.dae.sociosclub.entidades.Actividad;
 import es.ujaen.dae.sociosclub.entidades.Usuario;
 
 import es.ujaen.dae.sociosclub.excepciones.ClaveIncorrecta;
@@ -11,6 +12,9 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -18,10 +22,12 @@ import java.util.TreeMap;
 @Validated
 public class ServicioProyecto {
     Map<String, Usuario> usuarios;
-
+    Map<Long, Actividad> actividades;>
 
     public ServicioProyecto() {
         usuarios = new TreeMap<>();
+        actividades = new TreeMap<>();
+
     }
 
     public Usuario crearUsuario(@NotNull @Valid Usuario usuario) {
@@ -53,7 +59,12 @@ public class ServicioProyecto {
         return usuario;
     }
 
-
+    public List<Actividad> buscarActividades(@NotBlank String tituloCorto, @NotNull LocalDate fechaInicio, @NotNull LocalDate fechaFin){
+        List<Actividad> actividadesFiltradas = new ArrayList<>();
+        for (Actividad actividad : actividades.values()) {
+            if ()
+        }
+    }
 
 
 
