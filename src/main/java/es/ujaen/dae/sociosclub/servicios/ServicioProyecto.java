@@ -66,9 +66,9 @@ public class ServicioProyecto {
         }
     }
 
-        private boolean actividadValida(Actividad actividad, String tituloCorto, LocalDate fechaInicio, LocalDate fechaFin){
+    private boolean actividadValida(Actividad actividad, String tituloCorto, LocalDate fechaInicio, LocalDate fechaFin){
 
-        }
+    }
 
 
 }
