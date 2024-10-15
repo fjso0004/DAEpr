@@ -22,7 +22,7 @@ import java.util.TreeMap;
 @Validated
 public class ServicioProyecto {
     Map<String, Usuario> usuarios;
-    Map<Long, Actividad> actividades;>
+    Map<Long, Actividad> actividades;
 
     public ServicioProyecto() {
         usuarios = new TreeMap<>();
