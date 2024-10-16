@@ -4,12 +4,12 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class Temporada {
-    private int ano;
+    private int anio;
     private List<Actividad> actividades;
 
 
-    public Temporada(int ano) {
-        this.ano = ano;
+    public Temporada(int anio) {
+        this.anio = anio;
         this.actividades = new ArrayList<>(); 
     }
 
@@ -19,12 +19,12 @@ public class Temporada {
         actividad.setTemporada(this);
     }
 
-    public int getAno() {
-        return ano;
+    public int getAnio() {
+        return anio;
     }
 
-    public void setAno(int ano) {
-        this.ano = ano;
+    public void setAnio(int ano) {
+        this.anio = anio;
     }
 
     public List<Actividad> getActividades() {
