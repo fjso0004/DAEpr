@@ -10,7 +10,7 @@ public class TemporadaTest {
     @Test
     void testCrearTemporada() {
         var temporada = new Temporada(2024);
-        assertThat(temporada.getAno()).isEqualTo(2024);
+        assertThat(temporada.getAnio()).isEqualTo(2024);
         assertThat(temporada.getActividades()).isEmpty();
     }
 
@@ -31,9 +31,9 @@ public class TemporadaTest {
     }
 
     @Test
-    void testModificarAno() {
+    void testModificarAnio() {
         var temporada = new Temporada(2023);
-        temporada.setAno(2025);
-        assertThat(temporada.getAno()).isEqualTo(2025);
+        temporada.setAnio(2025);
+        assertThat(temporada.getAnio()).isEqualTo(2025);
     }
 }

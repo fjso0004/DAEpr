@@ -1,6 +1,12 @@
 package es.ujaen.dae.sociosclub.entidades;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.FutureOrPresent;
+
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -31,15 +37,13 @@ public class Actividad {
     @NotNull
     private Temporada temporada;
 
-    @NotNull
-    private Usuario direccion;
 
     private  List<Usuario> socios = new ArrayList<>();
     private  List<Solicitudes> solicitudes = new ArrayList<>();
 
 
     public Actividad(String tituloCorto, String descripcion, double precio, int numPlazas, LocalDate fechaCelebracion, LocalDate fechaInicio,
-                     LocalDate fechaFin, Usuario direccion, Temporada temporada) {
+                     LocalDate fechaFin) {
         this.id = generarIdActividad();
         this.tituloCorto = tituloCorto;
         this.descripcion = descripcion;
@@ -48,8 +52,7 @@ public class Actividad {
         this.fechaCelebracion = fechaCelebracion;
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
-        this.direccion = direccion;
-        this.temporada = temporada;
+
     }
 
     public String getTituloCorto(){
@@ -73,15 +76,15 @@ public class Actividad {
     public LocalDate getFechaFin(){
         return fechaFin;
     }
-    public Usuario getDireccion(){ return direccion; }
+
     public Temporada getTemporada() {
         return temporada;
     }
 
-/*  public void setTemporada(Temporada temporada) {
+  public void setTemporada(Temporada temporada) {
         this.temporada = temporada;
     }
-*/
+
     public List<Usuario> getSocios(){
         return new ArrayList<>(socios);
     }
@@ -109,8 +112,12 @@ public class Actividad {
         return this.solicitudes.stream().filter(solicitudes -> solicitudes.getEstado().equals(Solicitudes.EstadoSolicitud.PENDIENTE)).collect(Collectors.toList());
     }
 
-    private long generarIdActividad(){
+    public long generarIdActividad(){
         id++;
+        return id;
+    }
+
+    public long getId(){
         return id;
     }
 

@@ -10,7 +10,14 @@ import es.ujaen.dae.sociosclub.excepciones.ClaveIncorrecta;
 import es.ujaen.dae.sociosclub.excepciones.UsuarioNoRegistrado;
 import es.ujaen.dae.sociosclub.excepciones.UsuarioYaRegistrado;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.FutureOrPresent;
+
+
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -43,7 +50,7 @@ public class ServicioProyecto {
     }
 
     public Usuario autenticar(@NotBlank String dni, @NotBlank String clave) {
-        Usuario usuario = buscarCliente(dni);
+        Usuario usuario = buscarUsuario(dni);
         if (usuario == null) {
             throw new UsuarioNoRegistrado();
         }
@@ -64,9 +71,9 @@ public class ServicioProyecto {
 
     public Actividad crearActividad(@NotBlank String tituloCorto, @NotBlank String descripcion, @Positive double precio, @Positive int numPlazas,
                                     @FutureOrPresent LocalDate fechaCelebracion, @FutureOrPresent LocalDate fechaInicio,
-                                    @FutureOrPresent LocalDate fechaFinal, Temporada temporada) {
-        Actividad act = new Actividad(tituloCorto, descripcion, precio, numPlazas, fechaCelebracion, fechaInicio, fechaFinal, temporada);
-        actividades.put(act.getId(), act);
+                                    @FutureOrPresent LocalDate fechaFinal) {
+        Actividad act = new Actividad(tituloCorto, descripcion, precio, numPlazas, fechaCelebracion, fechaInicio, fechaFinal);
+        actividades.put(act.generarIdActividad(), act);
         return act;
     }
 
@@ -82,6 +89,7 @@ public class ServicioProyecto {
                 actividadesFiltradas.add(actividad);
             }
         }
+        return actividadesFiltradas;
     }
 
     private boolean actividadValida(Actividad actividad, String tituloCorto, LocalDate fechaCelebracion){
@@ -94,19 +102,43 @@ public class ServicioProyecto {
             throw new ActividadNoRegistrada();
         }
 
-        if (actividad.getNumPlazas() <= 0){
-            throw new PlazasNoDisponibles();
-        }
+        // if (actividad.getNumPlazas() <= 0){
+        //     throw new PlazasNoDisponibles();
+        // }
 
         Usuario socio = buscarUsuario(dniSocio);
         if (socio == null) {
             throw new UsuarioNoRegistrado();
         }
-//FALTA COMPROBAR QUE UN SOCIO NO HA HECHO SOLICITUD DE ESA ACTIVIDAD *************
+        
+        // for(i=0; i< actividad.getSolicitudes.size(); i++) {
 
+        //         if(actividad..getDni() == dniSocio) {
+        //             throw new UsuarioYaRegistrado();
+        //         }
+        // }
         Solicitudes solicitudes = new Solicitudes(actividad, socio);
         actividad.altaSolicitud(solicitudes);
         return solicitudes;
+    }
+
+
+     public void modificarSolicitud(@NotBlank long idSolicitud, @NotBlank long idActividad, @NotBlank int numacomp){
+         Actividad actividad = actividades.get(idActividad);
+        if(idSolicitud == null) {
+            throw new SolicitudNoRegistrada();
+        }else{
+           Solicitudes solicitud = actividad.solicitudes.get(idSolicitud);
+           solicitud.setNumAcomp(numacomp);
+        }
+      
+    }
+
+    public void marcarCuota(@NotBlank Usuario user) {
+        
+        if(user.getCuota == false){
+            user.setCuota(true);
+        }
     }
 
     public void asignarPlaza(@NotNull Solicitudes solicitudes){
@@ -114,11 +146,13 @@ public class ServicioProyecto {
         if (actividad == null) {
             throw new ActividadNoRegistrada();
         }
-        Usuario socio = solicitudes.getSocio;
-        actividades.nuevoSocio(socio);
-        if (socio.getCuota(){
+        Usuario socio = solicitudes.getUsuario();
+    
+        if (socio.getCuota() && actividad.getNumPlazas() > 0){
             solicitudes.setEstado(Solicitudes.EstadoSolicitud.ACEPTADA);
             actividad.borrarSolicitud(solicitudes);
+        }else {
+            solicitudes.setEstado(Solicitudes.EstadoSolicitud.PENDIENTE);
         }
     }
 

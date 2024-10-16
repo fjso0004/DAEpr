@@ -36,7 +36,7 @@ public class Solicitudes {
         this.fechaSolicitud = LocalDate.now();
     }
 
-    public Solicitudes(Actividad actividad, Usuario usuario) {
+    public Solicitudes(Actividad actividad, Usuario usuario ) {
         this();
         this.actividad = actividad;
         this.usuario = usuario;
@@ -47,6 +47,9 @@ public class Solicitudes {
     }
     public int getNumAcomp() {
         return num_acomp;
+    }
+    public void setNumAcomp(int num_acomp) {
+        this.num_acomp = num_acomp;
     }
     public LocalDate getFechaSolicitud() { return fechaSolicitud; }
     public Actividad getActividad() { return actividad; }
