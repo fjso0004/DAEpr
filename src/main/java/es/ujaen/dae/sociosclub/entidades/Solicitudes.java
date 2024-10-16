@@ -16,11 +16,11 @@ public class Solicitudes {
 
     private LocalDate fechaSolicitud;
 
-    public enum estadoSolicitud {
+    public enum EstadoSolicitud {
         PENDIENTE, ACEPTADA, RECHAZADA
     }
 
-    private estadoSolicitud estado;
+    private EstadoSolicitud estado;
 
     @NotNull
     private Actividad actividad;
@@ -32,7 +32,7 @@ public class Solicitudes {
     public Solicitudes() {
         this.id = generarIdSolicitud();
         this.num_acomp = num_acomp;
-        this.estado = estadoSolicitud.PENDIENTE;
+        this.estado = EstadoSolicitud.PENDIENTE;
         this.fechaSolicitud = LocalDate.now();
     }
 
@@ -45,9 +45,17 @@ public class Solicitudes {
     public long getId() {
         return id;
     }
-
     public int getNumAcomp() {
         return num_acomp;
+    }
+    public LocalDate getFechaSolicitud() { return fechaSolicitud; }
+    public Actividad getActividad() { return actividad; }
+    public Usuario getUsuario() { return usuario; }
+
+    public EstadoSolicitud getEstado() { return estado; }
+
+    public void setEstado(EstadoSolicitud estado) {
+        this.estado = estado;
     }
 
     private long generarIdSolicitud(){

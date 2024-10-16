@@ -4,11 +4,12 @@ import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class Actividad {
+
+    private long id = 0;
     @NotBlank
     private String tituloCorto;
 
@@ -18,7 +19,7 @@ public class Actividad {
     @Positive
     private double precio;
 
-    @PositiveOrZero
+    @Positive
     private int numPlazas;
 
     @FutureOrPresent
@@ -30,12 +31,16 @@ public class Actividad {
     @NotNull
     private Temporada temporada;
 
+    @NotNull
+    private Usuario direccion;
+
     private  List<Usuario> socios = new ArrayList<>();
     private  List<Solicitudes> solicitudes = new ArrayList<>();
 
 
     public Actividad(String tituloCorto, String descripcion, double precio, int numPlazas, LocalDate fechaCelebracion, LocalDate fechaInicio,
-                     LocalDate fechaFin, Temporada temporada) {
+                     LocalDate fechaFin, Usuario direccion, Temporada temporada) {
+        this.id = generarIdActividad();
         this.tituloCorto = tituloCorto;
         this.descripcion = descripcion;
         this.precio = precio;
@@ -43,6 +48,7 @@ public class Actividad {
         this.fechaCelebracion = fechaCelebracion;
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
+        this.direccion = direccion;
         this.temporada = temporada;
     }
 
@@ -67,7 +73,7 @@ public class Actividad {
     public LocalDate getFechaFin(){
         return fechaFin;
     }
-
+    public Usuario getDireccion(){ return direccion; }
     public Temporada getTemporada() {
         return temporada;
     }
@@ -87,7 +93,7 @@ public class Actividad {
         }
     }
 
-    public void anadirSolicitud(Solicitudes solicitud){
+    public void altaSolicitud(Solicitudes solicitud){
         solicitudes.add(solicitud);
     }
 
@@ -100,7 +106,12 @@ public class Actividad {
     }
 
     public List<Solicitudes> getSolicitudesPendientes(){
-        return this.solicitudes.stream().filter(solicitud -> solicitud.getEstado().equals(Solicitudes.estadoSolicitud.PENDIENTE)).collect(Collectors.toList());
+        return this.solicitudes.stream().filter(solicitudes -> solicitudes.getEstado().equals(Solicitudes.EstadoSolicitud.PENDIENTE)).collect(Collectors.toList());
+    }
+
+    private long generarIdActividad(){
+        id++;
+        return id;
     }
 
 
