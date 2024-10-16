@@ -12,6 +12,7 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.text.Normalizer;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +60,11 @@ public class ServicioProyecto {
         return usuario;
     }
 
+    public String normalizar(String texto){
+        String str = Normalizer.normalize(texto, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+        return str.trim().toLowerCase();
+    }
+
     public List<Actividad> buscarActividades(@NotBlank String tituloCorto, @NotNull LocalDate fechaInicio, @NotNull LocalDate fechaFin){
         List<Actividad> actividadesFiltradas = new ArrayList<>();
         for (Actividad actividad : actividades.values()) {
@@ -66,8 +72,8 @@ public class ServicioProyecto {
         }
     }
 
-    private boolean actividadValida(Actividad actividad, String tituloCorto, LocalDate fechaInicio, LocalDate fechaFin){
-
+    private boolean actividadValida(Actividad actividad, String tituloCorto, LocalDate fechaCelebracion){
+        return normalizar(actividad.getTituloCorto()).equals(normalizar(tituloCorto)) && actividad.getFechaCelebracion().equals(fechaCelebracion);
     }
 
 

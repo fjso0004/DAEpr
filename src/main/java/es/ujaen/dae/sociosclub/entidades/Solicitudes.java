@@ -2,18 +2,44 @@ package es.ujaen.dae.sociosclub.entidades;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDate;
 
 public class Solicitudes {
+
     private long id = 0;
 
     @Min(value = 0)
     @Max(value = 5)
     private int num_acomp;
 
+    private LocalDate fechaSolicitud;
 
-    public Solicitudes(long id, int num_acomp) {
+    public enum estadoSolicitud {
+        PENDIENTE, ACEPTADA, RECHAZADA
+    }
+
+    private estadoSolicitud estado;
+
+    @NotNull
+    private Actividad actividad;
+
+    @NotNull
+    private Usuario usuario;
+
+
+    public Solicitudes() {
         this.id = generarIdSolicitud();
-        this.num_acomp= num_acomp;
+        this.num_acomp = num_acomp;
+        this.estado = estadoSolicitud.PENDIENTE;
+        this.fechaSolicitud = LocalDate.now();
+    }
+
+    public Solicitudes(Actividad actividad, Usuario usuario) {
+        this();
+        this.actividad = actividad;
+        this.usuario = usuario;
     }
 
     public long getId() {

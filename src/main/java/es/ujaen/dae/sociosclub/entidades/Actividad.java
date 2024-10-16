@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Actividad {
     @NotBlank
@@ -33,7 +34,8 @@ public class Actividad {
     private  List<Solicitudes> solicitudes = new ArrayList<>();
 
 
-    public Actividad(String tituloCorto, String descripcion, double precio, int numPlazas, LocalDate fechaCelebracion, LocalDate fechaInicio, LocalDate fechaFin) {
+    public Actividad(String tituloCorto, String descripcion, double precio, int numPlazas, LocalDate fechaCelebracion, LocalDate fechaInicio,
+                     LocalDate fechaFin, Temporada temporada) {
         this.tituloCorto = tituloCorto;
         this.descripcion = descripcion;
         this.precio = precio;
@@ -41,6 +43,7 @@ public class Actividad {
         this.fechaCelebracion = fechaCelebracion;
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
+        this.temporada = temporada;
     }
 
     public String getTituloCorto(){
@@ -69,10 +72,10 @@ public class Actividad {
         return temporada;
     }
 
-    public void setTemporada(Temporada temporada) {
+/*  public void setTemporada(Temporada temporada) {
         this.temporada = temporada;
     }
-
+*/
     public List<Usuario> getSocios(){
         return new ArrayList<>(socios);
     }
@@ -84,7 +87,7 @@ public class Actividad {
         }
     }
 
-    public void añadirSolicitud(Solicitudes solicitud){
+    public void anadirSolicitud(Solicitudes solicitud){
         solicitudes.add(solicitud);
     }
 
@@ -94,6 +97,10 @@ public class Actividad {
 
     public List<Solicitudes> getSolicitudes(){
         return this.solicitudes;
+    }
+
+    public List<Solicitudes> getSolicitudesPendientes(){
+        return this.solicitudes.stream().filter(solicitud -> solicitud.getEstado().equals(Solicitudes.estadoSolicitud.PENDIENTE)).collect(Collectors.toList());
     }
 
 
