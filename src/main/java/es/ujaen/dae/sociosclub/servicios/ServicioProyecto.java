@@ -13,6 +13,7 @@ import es.ujaen.dae.sociosclub.excepciones.SolicitudNoRegistrada;
 import es.ujaen.dae.sociosclub.repositorios.ActividadRepositorio;
 import es.ujaen.dae.sociosclub.repositorios.UsuarioRepositorio;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -20,6 +21,7 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.FutureOrPresent;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -39,15 +41,18 @@ public class ServicioProyecto {
     public ServicioProyecto() {
         usuarios = new TreeMap<>();
         actividades = new TreeMap<>();
-
     }
 
+    @Autowired
+    private UsuarioRepositorio usuarioRepositorio;
+    @Autowired
+    private ActividadRepositorio actividadRepositorio;
+
     public Usuario crearUsuario(@NotNull @Valid Usuario usuario) {
-        if (usuarios.containsKey(usuario.getDni())) {
+        if (usuarioRepositorio.existsById(usuario.getDni())) {
             throw new UsuarioYaRegistrado();
         }
-        usuarios.put(usuario.getDni(), usuario);
-        return usuario;
+        return usuarioRepositorio.save(usuario);
     }
 
     public Usuario autenticar(@NotBlank String dni, @NotBlank String clave) {
@@ -59,7 +64,7 @@ public class ServicioProyecto {
     }
 
     public Usuario buscarUsuario(@NotBlank String dni) {
-        Usuario usuario = usuarios.get(dni);
+        Usuario usuario = usuarioRepositorio.findByDni(dni);
         if (usuario == null) {
             throw new UsuarioNoRegistrado();
         }
@@ -75,7 +80,7 @@ public class ServicioProyecto {
     }
 
     public List<Actividad> buscarActividades(@NotBlank String tituloCorto, @NotNull LocalDate fechaCelebracion) {
-        List<Actividad> actividadesFiltradas = new ArrayList<>();
+        List<Actividad> actividadesFiltradas = actividadRepositorio.findByTituloCortoAndFechaCelebracion(tituloCorto, fechaCelebracion);
         for (Actividad actividad : actividades.values()) {
             if (actividadValida(actividad, tituloCorto, fechaCelebracion)) {
                 actividadesFiltradas.add(actividad);
@@ -92,6 +97,7 @@ public class ServicioProyecto {
         return normalizar(actividad.getTituloCorto()).equals(normalizar(tituloCorto)) && actividad.getFechaCelebracion().equals(fechaCelebracion);
     }
 
+    @Transactional
     public Solicitudes crearSolicitud(@NotNull long idActividad, @NotBlank String dniSocio) {
         Actividad actividad = actividades.get(idActividad);
         if (actividad == null) throw new ActividadNoRegistrada();
@@ -117,34 +123,6 @@ public class ServicioProyecto {
         actividad.altaSolicitud(solicitud);
         return solicitud;
     }
-
-    /*
-    public Solicitudes crearSolicitud(@NotBlank long idActividad, @NotBlank String dniSocio){
-        Actividad actividad = actividades.get(idActividad);
-        if (actividad == null) {
-            throw new ActividadNoRegistrada();
-        }
-
-        // if (actividad.getNumPlazas() <= 0){
-        //     throw new PlazasNoDisponibles();
-        // }
-
-        Usuario socio = buscarUsuario(dniSocio);
-        if (socio == null) {
-            throw new UsuarioNoRegistrado();
-        }
-
-        // for(i=0; i< actividad.getSolicitudes.size(); i++) {
-
-        //         if(actividad..getDni() == dniSocio) {
-        //             throw new UsuarioYaRegistrado();
-        //         }
-        // }
-        Solicitudes solicitudes = new Solicitudes(actividad, socio);
-        actividad.altaSolicitud(solicitudes);
-        return solicitudes;
-    }
-     */
 
     public void modificarSolicitud(@NotNull long idSolicitud, @NotNull long idActividad, @PositiveOrZero int numAcomp) {
         Actividad actividad = actividades.get(idActividad);
