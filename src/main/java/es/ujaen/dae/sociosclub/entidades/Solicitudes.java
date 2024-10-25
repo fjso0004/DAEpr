@@ -1,31 +1,39 @@
 package es.ujaen.dae.sociosclub.entidades;
 
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
 public class Solicitudes {
 
-    private long id = 0;
+    public enum EstadoSolicitud {
+        PENDIENTE, ACEPTADA, RECHAZADA
+    }
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Min(value = 0)
     @Max(value = 5)
     private int num_acomp;
 
+    @NotBlank
     private LocalDate fechaSolicitud;
 
-    public enum EstadoSolicitud {
-        PENDIENTE, ACEPTADA, RECHAZADA
-    }
-
+    @Enumerated(EnumType.STRING)
     private EstadoSolicitud estado;
 
-    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "actividad_id")
     private Actividad actividad;
 
-    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "usuario_dni")
     private Usuario usuario;
 
 

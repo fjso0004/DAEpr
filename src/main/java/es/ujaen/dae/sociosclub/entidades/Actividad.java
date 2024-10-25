@@ -1,5 +1,6 @@
 package es.ujaen.dae.sociosclub.entidades;
 
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
@@ -15,7 +16,10 @@ import java.util.stream.Collectors;
 
 public class Actividad {
 
-    private long id = 0;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @NotBlank
     private String tituloCorto;
 
@@ -28,18 +32,19 @@ public class Actividad {
     @Positive
     private int numPlazas;
 
-    @FutureOrPresent
+    @NotBlank
     private LocalDate fechaCelebracion;
 
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
 
-    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "temporada_id")
     private Temporada temporada;
 
-
+    @OneToMany(mappedBy = "actividad", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Solicitudes> solicitudes = new ArrayList<>();
     private  List<Usuario> socios = new ArrayList<>();
-    private  List<Solicitudes> solicitudes = new ArrayList<>();
 
 
     public Actividad(String tituloCorto, String descripcion, double precio, int numPlazas, LocalDate fechaCelebracion, LocalDate fechaInicio,
@@ -89,7 +94,7 @@ public class Actividad {
         return new ArrayList<>(socios);
     }
 
-    public void nuevoSocio(Usuario usuario){
+    public synchronized void nuevoSocio(Usuario usuario){
         if (numPlazas > 0) {
             socios.add(usuario);
             numPlazas--;
@@ -120,7 +125,4 @@ public class Actividad {
     public long getId(){
         return id;
     }
-
-
 }
-

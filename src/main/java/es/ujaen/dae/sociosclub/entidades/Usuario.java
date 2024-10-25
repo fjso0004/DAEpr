@@ -1,33 +1,39 @@
 package es.ujaen.dae.sociosclub.entidades;
 
-
+import jakarta.persistence.*;
 import es.ujaen.dae.sociosclub.util.CodificadorMd5;
 import es.ujaen.dae.sociosclub.util.ExprReg;
+import jakarta.persistence.CascadeType;
 import jakarta.validation.constraints.*;
 
 import java.beans.Expression;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Usuario {
 
+    @Id
     @Pattern(regexp = ExprReg.DNI)
-    String dni;
+    private String dni;
 
     @NotBlank
-    String nombre;
+    private String nombre;
 
     @NotBlank
-    String apellidos;
+    private String apellidos;
 
-    @NotBlank
-    String direccion;
+    private String direccion;
 
-    String tlf;
-    String email;
+    private String tlf;
+    private String email;
 
     @Size(min = 8)
-    String clave;
+    private String clave;
 
     boolean cuotaPagada;
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    private List<Solicitudes> solicitudes = new ArrayList<>();
 
 
 public Usuario(String dni, String nombre, String apellidos, String dirección, String tlf, String email, String clave, boolean cuotaPagada){

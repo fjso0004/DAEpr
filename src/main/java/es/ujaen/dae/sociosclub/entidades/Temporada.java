@@ -1,11 +1,16 @@
 package es.ujaen.dae.sociosclub.entidades;
 
+import jakarta.persistence.*;
 import java.util.List;
 import java.util.ArrayList;
 
 public class Temporada {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int anio;
-    private List<Actividad> actividades;
+
+    @OneToMany(mappedBy = "temporada", cascade = CascadeType.ALL)
+    private List<Actividad> actividades = new ArrayList<>();
 
 
     public Temporada(int anio) {
