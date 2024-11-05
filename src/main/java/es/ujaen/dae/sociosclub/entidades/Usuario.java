@@ -5,7 +5,6 @@ import es.ujaen.dae.sociosclub.util.CodificadorMd5;
 import es.ujaen.dae.sociosclub.util.ExprReg;
 import jakarta.validation.constraints.*;
 
-import java.beans.Expression;
 
 public class Usuario {
 
@@ -30,14 +29,19 @@ public class Usuario {
     boolean cuotaPagada;
 
 
-public Usuario(String dni, String nombre, String apellidos, String dirección, String tlf, String email, String clave, boolean cuotaPagada){
+public Usuario(String dni, String nombre, String apellidos, String direccion, String tlf, String email, String clave, boolean cuotaPagada){
     this.dni = dni;
     this.nombre = nombre;
     this.apellidos = apellidos;
     this.tlf = tlf;
     this.email = email;
+    this.direccion = direccion;
     this.clave = clave;
     this.cuotaPagada= cuotaPagada;
+}
+
+public Usuario() {
+    
 }
 
 public boolean claveValida(String clave){
@@ -50,6 +54,10 @@ public String getDni() {
 
 public String getNombre() {
     return nombre;
+}
+
+public String getApellidos() {
+    return apellidos;
 }
 
 public String getTlf() {

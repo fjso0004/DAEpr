@@ -23,7 +23,7 @@ public class Temporada {
         return anio;
     }
 
-    public void setAnio(int ano) {
+    public void setAnio(int anio) {
         this.anio = anio;
     }
 

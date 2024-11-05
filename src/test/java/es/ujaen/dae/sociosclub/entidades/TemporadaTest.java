@@ -3,37 +3,50 @@ package es.ujaen.dae.sociosclub.entidades;
 import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.time.LocalDate;
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class TemporadaTest {
+class TemporadaTest {
+
+    private Temporada temporada;
+    private Actividad actividad;
+
+    @BeforeEach
+    void configInicial() {
+        temporada = new Temporada(2024);
+        actividad = new Actividad("Clase de Baile", "Curso de salsa para principiantes", 50.0, 20, 
+                                  LocalDate.now().plusDays(10), LocalDate.now(), LocalDate.now().plusDays(15));
+    }
 
     @Test
     void testCrearTemporada() {
-        var temporada = new Temporada(2024);
-        assertThat(temporada.getAnio()).isEqualTo(2024);
-        assertThat(temporada.getActividades()).isEmpty();
+        assertEquals(2024, temporada.getAnio(), "El año de la temporada debería ser 2024.");
+        assertTrue(temporada.getActividades().isEmpty(), "La temporada debería comenzar sin actividades.");
     }
 
     @Test
     void testAgregarActividad() {
-        var temporada = new Temporada(2024);
-
-        var actividad = new Actividad("Visita al Museo", "Visita guiada al museo de la ciudad", 20.0, 15,
-                LocalDate.of(2024, 11, 15), LocalDate.of(2024, 10, 1), LocalDate.of(2024, 10, 30));
-
         temporada.agregarActividad(actividad);
 
         List<Actividad> actividades = temporada.getActividades();
-        assertThat(actividades).hasSize(1);
-        assertThat(actividades).contains(actividad);
-
-        assertThat(actividad.getTemporada()).isEqualTo(temporada);
+        assertEquals(1, actividades.size(), "Debería haber una actividad en la temporada.");
+        assertEquals(actividad, actividades.get(0), "La actividad agregada no coincide.");
+        assertEquals(temporada, actividad.getTemporada(), "La actividad debería estar asignada a la temporada.");
     }
 
     @Test
-    void testModificarAnio() {
-        var temporada = new Temporada(2023);
+    void testSetAnio() {
         temporada.setAnio(2025);
-        assertThat(temporada.getAnio()).isEqualTo(2025);
+        assertEquals(2025, temporada.getAnio(), "El anio de la temporada debería ser 2025.");
+    }
+
+    @Test
+    void testSetActividades() {
+        List<Actividad> nuevasActividades = List.of(new Actividad("Yoga", "Clase de yoga avanzada", 30.0, 15, 
+                                                                 LocalDate.now().plusDays(20), LocalDate.now(), LocalDate.now().plusDays(25)));
+        temporada.setActividades(nuevasActividades);
+
+        assertEquals(1, temporada.getActividades().size(), "La lista de actividades debería tener una actividad.");
+        assertEquals("Yoga", temporada.getActividades().get(0).getTituloCorto(), "La actividad debería ser la clase de yoga.");
     }
 }
