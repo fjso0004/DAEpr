@@ -13,6 +13,7 @@ import jakarta.validation.constraints.FutureOrPresent;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.swing.*;
 import java.text.Normalizer;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -26,6 +27,9 @@ public class ServicioProyecto {
     private Map<String, Usuario> usuarios;
     private Map<Long, Actividad> actividades;
     private static long contadorActividades = 0;
+
+    private static final Usuario administrador = new Usuario("12345678A", "admin", "-", "-", "659123456",
+            "admin@sociosclub.es", "SuperUser", true);
 
     public ServicioProyecto() {
         usuarios = new TreeMap<>();
@@ -41,19 +45,24 @@ public class ServicioProyecto {
     }
 
     public Usuario autenticar(@NotBlank String dni, @NotBlank String clave) {
-        Usuario usuario = buscarUsuario(dni);
+
         if (!usuario.claveValida(clave)) {
             throw new ClaveIncorrecta();
         }
         return usuario;
     }
 
-    public Usuario buscarUsuario(@NotBlank String dni) {
-        Usuario usuario = usuarios.get(dni);
-        if (usuario == null) {
-            throw new UsuarioNoRegistrado();
+    public Usuario buscarUsuario(Usuario administrador, @NotBlank String dni) {
+        if (administrador.getNombre().equals("admin")){
+            Usuario usuario = usuarios.get(dni);
+            if (usuario == null) {
+                throw new UsuarioYaRegistrado();
+            }
+            return usuario;
+
+        }else {
+            throw new OperacionDeAdmin();
         }
-        return usuario;
     }
 
     public Actividad crearActividad(@NotBlank String tituloCorto, @NotBlank String descripcion, @Positive double precio, @Positive int numPlazas,
