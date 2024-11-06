@@ -79,10 +79,10 @@ public class ServicioProyecto {
         return act;
     }
 
-    public List<Actividad> buscarActividades(@NotBlank String tituloCorto, @NotNull LocalDate fechaCelebracion) {
-        List<Actividad> actividadesFiltradas = actividadRepositorio.findByTituloCortoAndFechaCelebracion(tituloCorto, fechaCelebracion);
+    public List<Actividad> buscarActividades() {
+        List<Actividad> actividadesFiltradas = new ArrayList<>();
         for (Actividad actividad : actividades.values()) {
-            if (actividadValida(actividad, tituloCorto, fechaCelebracion)) {
+            if (actividadValida(actividad)) {
                 actividadesFiltradas.add(actividad);
             }
         }
@@ -93,8 +93,8 @@ public class ServicioProyecto {
         return Normalizer.normalize(texto, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").trim().toLowerCase();
     }
 
-    private boolean actividadValida(Actividad actividad, String tituloCorto, LocalDate fechaCelebracion) {
-        return normalizar(actividad.getTituloCorto()).equals(normalizar(tituloCorto)) && actividad.getFechaCelebracion().equals(fechaCelebracion);
+    private boolean actividadValida(Actividad actividad) {
+        return actividad.getFechaCelebracion().isAfter(LocalDate.now());
     }
 
     @Transactional
