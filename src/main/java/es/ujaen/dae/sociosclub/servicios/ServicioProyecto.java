@@ -44,12 +44,13 @@ public class ServicioProyecto {
         return usuario;
     }
 
-    public Usuario autenticar(@NotBlank String dni, @NotBlank String clave) {
+    public boolean login(@NotBlank String dni, @NotBlank String clave) {
+        Usuario usuario = usuarios.get(dni);
 
-        if (!usuario.claveValida(clave)) {
-            throw new ClaveIncorrecta();
+        if (usuario == null || !usuario.getDni().equals(dni) || !usuario.getClave().equals(clave)) {
+            throw new ClaveoUsuarioIncorrecto("Usuario o clave incorrecto");
         }
-        return usuario;
+        return true;
     }
 
     public Usuario buscarUsuario(Usuario administrador, @NotBlank String dni) {
@@ -87,7 +88,7 @@ public class ServicioProyecto {
         }
         return actividadesFiltradas;
     }
-    }
+    
 
     private boolean actividadValida(Actividad actividad) {
         return actividad.getFechaCelebracion().isAfter(LocalDate.now());
@@ -98,7 +99,7 @@ public class ServicioProyecto {
         if (actividad == null) {
             throw new ActividadNoRegistrada();
         }
-        Usuario socio = buscarUsuario(dniSocio);
+        Usuario socio = usuarios.get(dniSocio);
 
         for (Solicitudes solicitud : actividad.getSolicitudes()) {
             if (solicitud.getUsuario().getDni().equals(dniSocio)) {
