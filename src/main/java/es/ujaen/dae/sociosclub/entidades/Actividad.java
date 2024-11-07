@@ -38,7 +38,7 @@ public class Actividad {
     private Temporada temporada;
 
 
-    private  List<Usuario> socios = new ArrayList<>();
+//    private  List<Usuario> socios = new ArrayList<>();
     private  List<Solicitudes> solicitudes = new ArrayList<>();
 
 
@@ -81,10 +81,10 @@ public class Actividad {
         return temporada;
     }
 
-  public void setTemporada(Temporada temporada) {
+    public void setTemporada(Temporada temporada) {
         this.temporada = temporada;
     }
-
+/*
     public List<Usuario> getSocios(){
         return new ArrayList<>(socios);
     }
@@ -95,7 +95,7 @@ public class Actividad {
             numPlazas--;
         }
     }
-
+*/
     public void altaSolicitud(Solicitudes solicitud){
         solicitudes.add(solicitud);
     }

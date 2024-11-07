@@ -5,10 +5,7 @@ import es.ujaen.dae.sociosclub.entidades.Solicitudes;
 import es.ujaen.dae.sociosclub.entidades.Usuario;
 import es.ujaen.dae.sociosclub.excepciones.*;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.*;
 
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -94,12 +91,17 @@ public class ServicioProyecto {
         return actividad.getFechaCelebracion().isAfter(LocalDate.now());
         }
 
-    public Solicitudes crearSolicitud(@Positive long idActividad, @NotBlank String dniSocio) {
+    public void crearSolicitud(@Positive long idActividad, @NotBlank String dniSocio, @Min(0) @Max(5) int num_acomp) {
         Actividad actividad = actividades.get(idActividad);
         if (actividad == null) {
             throw new ActividadNoRegistrada();
         }
+
         Usuario socio = usuarios.get(dniSocio);
+
+        if (socio == null) {
+            throw new UsuarioNoRegistrado();
+        }
 
         for (Solicitudes solicitud : actividad.getSolicitudes()) {
             if (solicitud.getUsuario().getDni().equals(dniSocio)) {
@@ -107,23 +109,34 @@ public class ServicioProyecto {
             }
         }
 
-        Solicitudes solicitud = new Solicitudes(actividad, socio);
+        Solicitudes.EstadoSolicitud estadoSolicitud;
+        if (socio.getCuota()) {
+           estadoSolicitud = Solicitudes.EstadoSolicitud.ACEPTADA;
+        } else {
+            estadoSolicitud = Solicitudes.EstadoSolicitud.PENDIENTE;
+        }
+        //acumula número acompañantes
+        var acompTotales= num_acomp;
+
+        Solicitudes solicitud = new Solicitudes(actividad, socio, num_acomp, estadoSolicitud);
         actividad.altaSolicitud(solicitud);
-        return solicitud;
-    }
+//        return solicitud;
+        }
+
 
     public void modificarSolicitud(@Positive long idActividad, @Positive long idSolicitud, @Positive int numAcomp) {
         Actividad actividad = actividades.get(idActividad);
         if (actividad == null) {
             throw new ActividadNoRegistrada();
         }
-
+/*
         Solicitudes solicitud = actividad.getSolicitudes().stream()
                 .filter(s -> s.getId() == idSolicitud)
                 .findFirst()
                 .orElseThrow(SolicitudNoRegistrada::new);
 
         solicitud.setNumAcomp(numAcomp);
+ */
     }
 
     public void marcarCuota(@NotNull Usuario user) {
@@ -141,7 +154,7 @@ public class ServicioProyecto {
 
         if (socio.getCuota() && actividad.getNumPlazas() > 0) {
             solicitud.setEstado(Solicitudes.EstadoSolicitud.ACEPTADA);
-            actividad.nuevoSocio(socio);
+//            actividad.nuevoSocio(socio);
             actividad.borrarSolicitud(solicitud);
         } else {
             solicitud.setEstado(Solicitudes.EstadoSolicitud.PENDIENTE);

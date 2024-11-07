@@ -30,7 +30,7 @@ public class ActividadTest {
         assertEquals(2, actividad.getNumPlazas());
         assertNotNull(actividad.getFechaCelebracion());
     }
-
+/*
     @Test
     public void testAgregarSocioExitosamente() {
         Usuario usuario1 = new Usuario();
@@ -52,7 +52,7 @@ public class ActividadTest {
         assertEquals(2, actividad.getSocios().size());  
         assertEquals(0, actividad.getNumPlazas());      
     }
-
+*/
     @Test
     public void testAgregarSolicitud() {
         Solicitudes solicitud = new Solicitudes();

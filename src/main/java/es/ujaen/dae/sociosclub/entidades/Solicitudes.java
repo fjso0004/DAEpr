@@ -36,10 +36,12 @@ public class Solicitudes {
         this.fechaSolicitud = LocalDate.now();
     }
 
-    public Solicitudes(Actividad actividad, Usuario usuario ) {
+    public Solicitudes(Actividad actividad, Usuario usuario, int num_acomp, EstadoSolicitud estado) {
         this();
         this.actividad = actividad;
         this.usuario = usuario;
+        this.num_acomp = num_acomp;
+        this.estado = estado;
     }
 
     public long getId() {
