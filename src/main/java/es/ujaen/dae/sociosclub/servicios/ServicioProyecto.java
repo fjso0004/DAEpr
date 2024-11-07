@@ -78,20 +78,20 @@ public class ServicioProyecto {
         return Normalizer.normalize(texto, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").trim().toLowerCase();
     }
 
-    public List<Actividad> buscarActividades(@NotBlank String tituloCorto, @NotNull LocalDate fechaCelebracion) {
+    public List<Actividad> buscarActividades() {
         List<Actividad> actividadesFiltradas = new ArrayList<>();
         for (Actividad actividad : actividades.values()) {
-            if (actividadValida(actividad, tituloCorto, fechaCelebracion)) {
+            if (actividadValida(actividad)) {
                 actividadesFiltradas.add(actividad);
             }
         }
         return actividadesFiltradas;
     }
-
-    private boolean actividadValida(Actividad actividad, String tituloCorto, LocalDate fechaCelebracion) {
-        return normalizar(actividad.getTituloCorto()).equals(normalizar(tituloCorto)) &&
-                actividad.getFechaCelebracion().equals(fechaCelebracion);
     }
+
+    private boolean actividadValida(Actividad actividad) {
+        return actividad.getFechaCelebracion().isAfter(LocalDate.now());
+        }
 
     public Solicitudes crearSolicitud(@Positive long idActividad, @NotBlank String dniSocio) {
         Actividad actividad = actividades.get(idActividad);
