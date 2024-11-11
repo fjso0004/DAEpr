@@ -31,7 +31,7 @@ public class Solicitudes {
 
     public Solicitudes() {
         this.id = generarIdSolicitud();
-        this.num_acomp = num_acomp;
+        this.num_acomp = 0;
         this.estado = EstadoSolicitud.PENDIENTE;
         this.fechaSolicitud = LocalDate.now();
     }
@@ -54,6 +54,9 @@ public class Solicitudes {
         this.num_acomp = num_acomp;
     }
     public LocalDate getFechaSolicitud() { return fechaSolicitud; }
+    public void setActividad(Actividad actividad) {
+        this.actividad = actividad;
+    }
     public Actividad getActividad() { return actividad; }
     public Usuario getUsuario() { return usuario; }
 

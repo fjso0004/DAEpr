@@ -6,14 +6,9 @@ import es.ujaen.dae.sociosclub.excepciones.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
 import java.time.LocalDate;
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 public class ServicioProyectoTest {
 
@@ -25,7 +20,7 @@ public class ServicioProyectoTest {
         servicioProyecto = new ServicioProyecto();
     }
 
-    // Test para crearUsuario: Caso exitoso
+ 
     @Test
     public void testCrearUsuarioExitoso() {
         Usuario usuario = new Usuario("12345678B", "nombre", "apellido", "apellido2", "600000000", "email@domain.com", "clave", false);
@@ -33,7 +28,6 @@ public class ServicioProyectoTest {
         assertEquals(usuario, result);
     }
 
-    // Test para crearUsuario: Usuario ya registrado
     @Test
     public void testCrearUsuarioYaRegistrado() {
         Usuario usuario = new Usuario("12345678B", "nombre", "apellido", "apellido2", "600000000", "email@domain.com", "clave", false);
@@ -41,16 +35,25 @@ public class ServicioProyectoTest {
         assertThrows(UsuarioYaRegistrado.class, () -> servicioProyecto.crearUsuario(usuario));
     }
 
-    // Test para autenticar: Caso exitoso
-    @Test
-    public void testLoginUsuarioExitoso() {
-        Usuario usuario = new Usuario("12345678B", "nombre", "apellido", "apellido2", "600000000", "email@domain.com", "clave", false);
-        servicioProyecto.crearUsuario(usuario);
-    //    Usuario result = servicioProyecto.login("12345678B", "clave");
-    //    assertEquals(usuario, result);
-    }
 
-    // Test para autenticar: Clave incorrecta
+
+ 
+     @Test
+     void testAsignarPlaza() {
+         Actividad actividad = new Actividad("titulo", "descripcion", 10.0, 10, LocalDate.now().plusDays(2),
+                 LocalDate.now(), LocalDate.now().plusDays(5));
+         Usuario usuario = new Usuario("12345678B", "nombre", "apellido", "apellido2", "600000000", "email@domain.com", "clave", true);
+         Solicitudes solicitud = new Solicitudes(actividad, usuario, 0, Solicitudes.EstadoSolicitud.PENDIENTE);
+ 
+         actividad.altaSolicitud(solicitud);
+         servicioProyecto.asignarPlaza(solicitud);
+ 
+         assertEquals(Solicitudes.EstadoSolicitud.ACEPTADA, solicitud.getEstado());
+         assertEquals(9, actividad.getNumPlazas());
+     }
+ 
+
+
     @Test
     public void testAutenticarClaveoUsuarioIncorrecto() {
         Usuario usuario = new Usuario("12345678B", "nombre", "apellido", "apellido2", "600000000", "email@domain.com", "clave", false);
@@ -58,7 +61,7 @@ public class ServicioProyectoTest {
         assertThrows(ClaveoUsuarioIncorrecto.class, () -> servicioProyecto.login("12345678B", "claveIncorrecta"));
     }
 
-    // Test para crearActividad: Caso exitoso
+ 
     @Test
     public void testCrearActividadExitoso() {
         Actividad actividad = servicioProyecto.crearActividad("titulo", "descripcion", 10.0, 20,
@@ -68,10 +71,9 @@ public class ServicioProyectoTest {
         assertEquals(20, actividad.getNumPlazas());
     }
 
-    // Test para buscarActividades: Verificar que solo devuelve actividades futuras
+
     @Test
     public void testBuscarActividades() {
-        // Crear actividades pasadas y futuras
         servicioProyecto.crearActividad("titulo1", "descripcion", 10.0, 20, LocalDate.now().minusDays(1), LocalDate.now().minusDays(2), LocalDate.now());
         servicioProyecto.crearActividad("titulo2", "descripcion", 10.0, 20, LocalDate.now().plusDays(5), LocalDate.now(), LocalDate.now().plusDays(6));
         
@@ -80,13 +82,13 @@ public class ServicioProyectoTest {
         assertEquals("titulo2", actividades.get(0).getTituloCorto());
     }
 
-    // Test para crearSolicitud: Actividad no registrada
+
     @Test
     public void testCrearSolicitudActividadNoRegistrada() {
-        assertThrows(ActividadNoRegistrada.class, () -> servicioProyecto.crearSolicitud(999L, "12345678B"));
+        assertThrows(ActividadNoRegistrada.class, () -> servicioProyecto.crearSolicitud(999L, "12345678B", 4));
     }
 
-    // Test para crearSolicitud: Usuario ya registrado en la actividad
+
     @Test
     public void testCrearSolicitudUsuarioYaRegistrado() {
         Usuario usuario = new Usuario("12345678B", "nombre", "apellido", "apellido2", "600000000", "email@domain.com", "clave", false);
@@ -94,7 +96,7 @@ public class ServicioProyectoTest {
         Actividad actividad = servicioProyecto.crearActividad("titulo", "descripcion", 10.0, 20,
                 LocalDate.now().plusDays(1), LocalDate.now(), LocalDate.now().plusDays(2));
         
-        servicioProyecto.crearSolicitud(actividad.getId(), usuario.getDni());
-        assertThrows(UsuarioYaRegistrado.class, () -> servicioProyecto.crearSolicitud(actividad.getId(), usuario.getDni()));
+        servicioProyecto.crearSolicitud(actividad.getId(), usuario.getDni(), 3);
+        assertThrows(UsuarioYaRegistrado.class, () -> servicioProyecto.crearSolicitud(actividad.getId(), usuario.getDni(),3));
     }
 }

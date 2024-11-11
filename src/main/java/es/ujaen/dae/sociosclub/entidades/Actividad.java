@@ -1,9 +1,7 @@
 package es.ujaen.dae.sociosclub.entidades;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.FutureOrPresent;
 
@@ -38,7 +36,6 @@ public class Actividad {
     private Temporada temporada;
 
 
-//    private  List<Usuario> socios = new ArrayList<>();
     private  List<Solicitudes> solicitudes = new ArrayList<>();
 
 
@@ -84,23 +81,24 @@ public class Actividad {
     public void setTemporada(Temporada temporada) {
         this.temporada = temporada;
     }
-/*
-    public List<Usuario> getSocios(){
-        return new ArrayList<>(socios);
-    }
 
-    public void nuevoSocio(Usuario usuario){
-        if (numPlazas > 0) {
-            socios.add(usuario);
-            numPlazas--;
-        }
-    }
-*/
-    public void altaSolicitud(Solicitudes solicitud){
+
+public boolean altaSolicitud(Solicitudes solicitud) {
+    int totalSolicitantes = 1 + solicitud.getNumAcomp(); 
+
+    if (numPlazas >= totalSolicitantes) {
         solicitudes.add(solicitud);
+        solicitud.setActividad(this); 
+        numPlazas -= totalSolicitantes; 
+        return true; 
+    } else {
+        System.out.println("No hay suficientes plazas disponibles para esta solicitud.");
+        return false; 
     }
+}
 
     public void borrarSolicitud(Solicitudes solicitud){
+        solicitud.setActividad(null);
         solicitudes.remove(solicitud);
     }
 

@@ -30,29 +30,7 @@ public class ActividadTest {
         assertEquals(2, actividad.getNumPlazas());
         assertNotNull(actividad.getFechaCelebracion());
     }
-/*
-    @Test
-    public void testAgregarSocioExitosamente() {
-        Usuario usuario1 = new Usuario();
-        actividad.nuevoSocio(usuario1);
-        assertEquals(1, actividad.getSocios().size());
-        assertEquals(1, actividad.getNumPlazas());
-    }
 
-    @Test
-    public void testAgregarSocioSinPlazasDisponibles() {
-        Usuario usuario1 = new Usuario();
-        Usuario usuario2 = new Usuario();
-        Usuario usuario3 = new Usuario();
-
-        actividad.nuevoSocio(usuario1);
-        actividad.nuevoSocio(usuario2);
-        actividad.nuevoSocio(usuario3);  
-
-        assertEquals(2, actividad.getSocios().size());  
-        assertEquals(0, actividad.getNumPlazas());      
-    }
-*/
     @Test
     public void testAgregarSolicitud() {
         Solicitudes solicitud = new Solicitudes();

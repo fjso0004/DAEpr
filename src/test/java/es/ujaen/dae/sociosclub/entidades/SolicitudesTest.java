@@ -19,7 +19,7 @@ class SolicitudesTest {
 
     @Test
     void testCrearSolicitud() {
-        Solicitudes solicitud = new Solicitudes(actividad, usuario);
+        Solicitudes solicitud = new Solicitudes(actividad, usuario, 0, Solicitudes.EstadoSolicitud.PENDIENTE );
 
         assertNotNull(solicitud.getId(), "La solicitud debería tener un ID.");
         assertEquals(0, solicitud.getNumAcomp(), "El número de acompañantes debería ser 0 inicialmente.");
@@ -31,7 +31,7 @@ class SolicitudesTest {
 
     @Test
     void testSetNumAcomp_Valido() {
-        Solicitudes solicitud = new Solicitudes(actividad, usuario);
+        Solicitudes solicitud = new Solicitudes(actividad, usuario, 5, Solicitudes.EstadoSolicitud.PENDIENTE);
         solicitud.setNumAcomp(3);
 
         assertEquals(3, solicitud.getNumAcomp(), "El número de acompañantes debería ser 3.");
@@ -39,7 +39,7 @@ class SolicitudesTest {
 
     @Test
     void testSetNumAcomp_LimiteMaximo() {
-        Solicitudes solicitud = new Solicitudes(actividad, usuario);
+        Solicitudes solicitud = new Solicitudes(actividad, usuario, 5, Solicitudes.EstadoSolicitud.PENDIENTE);
         solicitud.setNumAcomp(5);
 
         assertEquals(5, solicitud.getNumAcomp(), "El número de acompañantes debería ser el límite máximo de 5.");
@@ -47,7 +47,7 @@ class SolicitudesTest {
 
     @Test
     void testSetNumAcomp_LimiteMinimo() {
-        Solicitudes solicitud = new Solicitudes(actividad, usuario);
+        Solicitudes solicitud = new Solicitudes(actividad, usuario, 1, Solicitudes.EstadoSolicitud.PENDIENTE);
         solicitud.setNumAcomp(0);
 
         assertEquals(0, solicitud.getNumAcomp(), "El número de acompañantes debería ser el límite mínimo de 0.");
@@ -55,7 +55,7 @@ class SolicitudesTest {
 
     @Test
     void testSetEstado() {
-        Solicitudes solicitud = new Solicitudes(actividad, usuario);
+        Solicitudes solicitud = new Solicitudes(actividad, usuario,3, Solicitudes.EstadoSolicitud.PENDIENTE);
         solicitud.setEstado(Solicitudes.EstadoSolicitud.ACEPTADA);
 
         assertEquals(Solicitudes.EstadoSolicitud.ACEPTADA, solicitud.getEstado(), "El estado de la solicitud debería ser ACEPTADA.");
@@ -64,7 +64,7 @@ class SolicitudesTest {
 
     @Test
     void testSolicitudCreacionConActividadYUsuario() {
-        Solicitudes solicitud = new Solicitudes(actividad, usuario);
+        Solicitudes solicitud = new Solicitudes(actividad, usuario, 3, Solicitudes.EstadoSolicitud.PENDIENTE);
 
         assertEquals("Curso de Yoga", solicitud.getActividad().getTituloCorto(), "El título de la actividad no coincide.");
         assertEquals("Juan Perez", solicitud.getUsuario().getNombre(), "El nombre del usuario no coincide.");
@@ -72,7 +72,7 @@ class SolicitudesTest {
 
     @Test
     void testCambioEstadoConActividad() {
-        Solicitudes solicitud = new Solicitudes(actividad, usuario);
+        Solicitudes solicitud = new Solicitudes(actividad, usuario, 2, Solicitudes.EstadoSolicitud.PENDIENTE);
         solicitud.setEstado(Solicitudes.EstadoSolicitud.ACEPTADA);
 
         assertEquals(Solicitudes.EstadoSolicitud.ACEPTADA, solicitud.getEstado(), "El estado de la solicitud debería ser ACEPTADA.");
@@ -80,7 +80,7 @@ class SolicitudesTest {
 
     @Test
     void testAsignacionNumeroAcompanantesConRestriccion() {
-        Solicitudes solicitud = new Solicitudes(actividad, usuario);
+        Solicitudes solicitud = new Solicitudes(actividad, usuario, 2, Solicitudes.EstadoSolicitud.PENDIENTE);
         solicitud.setNumAcomp(5);;
         assertEquals(5,  solicitud.getNumAcomp());
     }

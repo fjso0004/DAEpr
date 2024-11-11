@@ -10,8 +10,6 @@ import jakarta.validation.constraints.*;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.swing.*;
-import java.text.Normalizer;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +21,10 @@ import java.util.TreeMap;
 public class ServicioProyecto {
     private Map<String, Usuario> usuarios;
     private Map<Long, Actividad> actividades;
-    private static long contadorActividades = 0;
 
-    private static final Usuario administrador = new Usuario("12345678A", "admin", "-", "-", "659123456",
-            "admin@sociosclub.es", "SuperUser", true);
+
+    // private static final Usuario administrador = new Usuario("12345678A", "admin", "-", "-", "659123456",
+    //         "admin@sociosclub.es", "SuperUser", true);
 
     public ServicioProyecto() {
         usuarios = new TreeMap<>();
@@ -72,9 +70,6 @@ public class ServicioProyecto {
         return actividad;
     }
 
-    private String normalizar(String texto) {
-        return Normalizer.normalize(texto, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").trim().toLowerCase();
-    }
 
     public List<Actividad> buscarActividades() {
         List<Actividad> actividadesFiltradas = new ArrayList<>();
@@ -115,12 +110,10 @@ public class ServicioProyecto {
         } else {
             estadoSolicitud = Solicitudes.EstadoSolicitud.PENDIENTE;
         }
-        //acumula número acompañantes
-        var acompTotales= num_acomp;
 
         Solicitudes solicitud = new Solicitudes(actividad, socio, num_acomp, estadoSolicitud);
         actividad.altaSolicitud(solicitud);
-//        return solicitud;
+
         }
 
 
@@ -129,14 +122,7 @@ public class ServicioProyecto {
         if (actividad == null) {
             throw new ActividadNoRegistrada();
         }
-/*
-        Solicitudes solicitud = actividad.getSolicitudes().stream()
-                .filter(s -> s.getId() == idSolicitud)
-                .findFirst()
-                .orElseThrow(SolicitudNoRegistrada::new);
 
-        solicitud.setNumAcomp(numAcomp);
- */
     }
 
     public void marcarCuota(@NotNull Usuario user) {
@@ -154,7 +140,6 @@ public class ServicioProyecto {
 
         if (socio.getCuota() && actividad.getNumPlazas() > 0) {
             solicitud.setEstado(Solicitudes.EstadoSolicitud.ACEPTADA);
-//            actividad.nuevoSocio(socio);
             actividad.borrarSolicitud(solicitud);
         } else {
             solicitud.setEstado(Solicitudes.EstadoSolicitud.PENDIENTE);
