@@ -122,7 +122,6 @@ public class ServicioProyecto {
         if (actividad == null) {
             throw new ActividadNoRegistrada();
         }
-
     }
 
     public void marcarCuota(@NotNull Usuario user) {
