@@ -20,7 +20,7 @@ import java.util.TreeMap;
 @Validated
 public class ServicioProyecto {
     private Map<String, Usuario> usuarios;
-    private Map<Long, Actividad> actividades;
+    private Map<Integer, Actividad> actividades;
 
 
     // private static final Usuario administrador = new Usuario("12345678A", "admin", "-", "-", "659123456",
@@ -65,7 +65,7 @@ public class ServicioProyecto {
                                     @FutureOrPresent LocalDate fechaCelebracion, @FutureOrPresent LocalDate fechaInicio,
                                     @FutureOrPresent LocalDate fechaFinal) {
         Actividad actividad = new Actividad(tituloCorto, descripcion, precio, numPlazas, fechaCelebracion, fechaInicio, fechaFinal);
-        actividad.generarIdActividad();
+//        actividad.generarIdActividad();
         actividades.put(actividad.getId(), actividad);
         return actividad;
     }
