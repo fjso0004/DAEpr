@@ -1,5 +1,7 @@
 package es.ujaen.dae.sociosclub.entidades;
 
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.NotNull;
@@ -35,8 +37,11 @@ public class Actividad {
     @NotNull
     private Temporada temporada;
 
+    @OneToMany
+    @JoinColumn(name = "id-actividad")
+    private  List<Solicitudes> solicitudes;
 
-    private  List<Solicitudes> solicitudes = new ArrayList<>();
+public Actividad() {}
 
 
     public Actividad(String tituloCorto, String descripcion, double precio, int numPlazas, LocalDate fechaCelebracion, LocalDate fechaInicio,
@@ -49,7 +54,7 @@ public class Actividad {
         this.fechaCelebracion = fechaCelebracion;
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
-
+        solicitudes = new ArrayList<>();
     }
 
     public String getTituloCorto(){
