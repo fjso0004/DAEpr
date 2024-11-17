@@ -2,6 +2,7 @@ package es.ujaen.dae.sociosclub.entidades;
 
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.NotNull;
@@ -39,7 +40,7 @@ public class Actividad {
     @JoinColumn(name = "id-temporada")  
     private Temporada temporada;
 
-
+    @OneToMany (mappedBy = "actividad")
     private  List<Solicitudes> solicitudes = new ArrayList<>();
 
 

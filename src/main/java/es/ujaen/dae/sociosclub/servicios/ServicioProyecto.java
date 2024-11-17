@@ -4,9 +4,12 @@ import es.ujaen.dae.sociosclub.entidades.Actividad;
 import es.ujaen.dae.sociosclub.entidades.Solicitudes;
 import es.ujaen.dae.sociosclub.entidades.Usuario;
 import es.ujaen.dae.sociosclub.excepciones.*;
+import es.ujaen.dae.sociosclub.repositorios.RepositorioUsuario;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -19,12 +22,15 @@ import java.util.TreeMap;
 @Service
 @Validated
 public class ServicioProyecto {
+    @Autowired
+    RepositorioUsuario repositorioUsuario;
+
     private Map<String, Usuario> usuarios;
     private Map<Integer, Actividad> actividades;
 
 
-    // private static final Usuario administrador = new Usuario("12345678A", "admin", "-", "-", "659123456",
-    //         "admin@sociosclub.es", "SuperUser", true);
+     private static final Usuario administrador = new Usuario("12345678A", "admin", "-", "-", "659123456",
+             "admin@sociosclub.es", "SuperUser", true);
 
     public ServicioProyecto() {
         usuarios = new TreeMap<>();
@@ -32,11 +38,16 @@ public class ServicioProyecto {
     }
 
     public Usuario crearUsuario(@NotNull @Valid Usuario usuario) {
+        if (usuario.getDni().equals(administrador.getDni()))
+            throw new UsuarioYaRegistrado();
+/*
         if (usuarios.containsKey(usuario.getDni())) {
             throw new UsuarioYaRegistrado();
         }
         usuarios.put(usuario.getDni(), usuario);
         return usuario;
+ */
+        repositorioUsuario.crear(usuario);
     }
 
     public boolean login(@NotBlank String dni, @NotBlank String clave) {

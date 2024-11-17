@@ -1,5 +1,6 @@
 package es.ujaen.dae.sociosclub.entidades;
 
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -23,6 +24,7 @@ public class Solicitudes {
     private EstadoSolicitud estado;
 
     @NotNull
+    @ManyToOne
     private Actividad actividad;
 
     @NotNull

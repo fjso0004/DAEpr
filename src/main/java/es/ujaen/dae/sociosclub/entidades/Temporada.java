@@ -13,9 +13,11 @@ public class Temporada {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int anio;
+
     @OneToMany(mappedBy = "temporada")
     private List<Actividad> actividades;
 
+    public Temporada() {}
 
     public Temporada(int anio) {
         this.anio = anio;
