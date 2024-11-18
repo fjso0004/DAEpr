@@ -53,7 +53,7 @@ public boolean claveValida(String clave){
     return this.clave.equals(CodificadorMd5.codificar(clave));
 }
 
-public int getDni() {return dni;}
+public String getDni() {return dni;}
 
 public String getNombre() {
     return nombre;

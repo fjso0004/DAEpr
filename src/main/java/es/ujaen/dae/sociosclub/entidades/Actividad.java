@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class Actividad {
 
-    private long id = 0;
+    private int id = 0;
     @NotBlank
     private String tituloCorto;
 
@@ -115,12 +115,12 @@ public boolean altaSolicitud(Solicitudes solicitud) {
         return this.solicitudes.stream().filter(solicitudes -> solicitudes.getEstado().equals(Solicitudes.EstadoSolicitud.PENDIENTE)).collect(Collectors.toList());
     }
 
-    public long generarIdActividad(){
+    public int generarIdActividad(){
         id++;
         return id;
     }
 
-    public long getId(){
+    public int getId(){
         return id;
     }
 
