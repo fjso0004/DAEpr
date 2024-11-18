@@ -29,7 +29,7 @@ public class ServicioProyecto {
     private Map<Integer, Actividad> actividades;
 
 
-     private static final Usuario administrador = new Usuario("12345678A", "admin", "-", "-", "659123456",
+     private static final Usuario administrador = new Usuario("12345678Z", "admin", "-", "-", "659123456",
              "admin@sociosclub.es", "SuperUser", true);
 
     public ServicioProyecto() {
