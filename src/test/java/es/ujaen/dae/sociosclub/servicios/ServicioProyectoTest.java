@@ -75,13 +75,23 @@ public class ServicioProyectoTest {
         assertThat(actividad).isNotNull();
         assertThat(actividad.getTituloCorto()).isEqualTo("titulo");
         assertThat(actividad.getNumPlazas()).isEqualTo(20);
+        assertThat(actividad.getTemporada()).isNotNull(); // Verifica que la temporada no es null
+        assertThat(actividad.getTemporada().getAnio()).isEqualTo(LocalDate.now().plusDays(1).getYear()); // Verifica el año
+        /*
+        Actividad actividad = servicioProyecto.crearActividad("titulo", "descripcion", 10.0, 20,
+                LocalDate.now().plusDays(1), LocalDate.now(), LocalDate.now().plusDays(2));
+
+        assertThat(actividad).isNotNull();
+        assertThat(actividad.getTituloCorto()).isEqualTo("titulo");
+        assertThat(actividad.getNumPlazas()).isEqualTo(20);
+        */
     }
 
     @Test
     @DirtiesContext
     void testBuscarActividades() {
         servicioProyecto.crearActividad("titulo1", "descripcion", 10.0, 20,
-                LocalDate.now().minusDays(1), LocalDate.now().minusDays(2), LocalDate.now());
+                LocalDate.now(), LocalDate.now(), LocalDate.now().plusDays(2));
 
         servicioProyecto.crearActividad("titulo2", "descripcion", 10.0, 20,
                 LocalDate.now().plusDays(5), LocalDate.now(), LocalDate.now().plusDays(6));
@@ -109,7 +119,6 @@ public class ServicioProyectoTest {
                 LocalDate.now().plusDays(1), LocalDate.now(), LocalDate.now().plusDays(2));
 
         servicioProyecto.crearSolicitud(actividad.getId(), usuario.getDni(), 3);
-
         assertThatThrownBy(() -> servicioProyecto.crearSolicitud(actividad.getId(), usuario.getDni(), 3))
                 .isInstanceOf(UsuarioYaRegistrado.class);
     }

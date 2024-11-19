@@ -39,7 +39,7 @@ public class Actividad {
     @JoinColumn(name = "id-temporada")
     private Temporada temporada;
 
-    @OneToMany
+    @OneToMany(mappedBy = "actividad", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Solicitudes> solicitudes = new ArrayList<>();
 
     public Actividad() {
@@ -48,7 +48,6 @@ public class Actividad {
 
     public Actividad(String tituloCorto, String descripcion, double precio, int numPlazas, LocalDate fechaCelebracion, LocalDate fechaInicio,
                      LocalDate fechaFin) {
-        this.id = generarIdActividad();
         this.tituloCorto = tituloCorto;
         this.descripcion = descripcion;
         this.precio = precio;

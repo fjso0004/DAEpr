@@ -6,7 +6,6 @@ import java.util.ArrayList;
 @Entity
 public class Temporada {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int anio;
 
     @OneToMany

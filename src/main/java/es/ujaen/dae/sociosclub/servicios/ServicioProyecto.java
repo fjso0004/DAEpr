@@ -1,11 +1,14 @@
 package es.ujaen.dae.sociosclub.servicios;
 import es.ujaen.dae.sociosclub.entidades.Actividad;
 import es.ujaen.dae.sociosclub.entidades.Solicitudes;
+import es.ujaen.dae.sociosclub.entidades.Temporada;
 import es.ujaen.dae.sociosclub.entidades.Usuario;
 import es.ujaen.dae.sociosclub.excepciones.*;
 import es.ujaen.dae.sociosclub.repositorios.RepositorioActividad;
 import es.ujaen.dae.sociosclub.repositorios.RepositorioSolicitudes;
+import es.ujaen.dae.sociosclub.repositorios.RepositorioTemporada;
 import es.ujaen.dae.sociosclub.repositorios.RepositorioUsuario;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +27,14 @@ public class ServicioProyecto {
     RepositorioActividad repositorioActividad;
     @Autowired
     RepositorioSolicitudes repositorioSolicitudes;
+    @Autowired
+    RepositorioTemporada repositorioTemporada;
 
     private Map<String, Usuario> usuarios;
     private Map<Integer, Actividad> actividades;
 
 
-     private static final Usuario administrador = new Usuario("12345678Z", "admin", "-", "-", "659123456",
+    private static final Usuario administrador = new Usuario("12345678Z", "admin", "-", "-", "659123456",
              "admin@sociosclub.es", "SuperUser", true);
 
     public ServicioProyecto() {
@@ -90,7 +95,20 @@ public class ServicioProyecto {
     public Actividad crearActividad(@NotBlank String tituloCorto, @NotBlank String descripcion, @Positive double precio, @Positive int numPlazas,
                                     @FutureOrPresent LocalDate fechaCelebracion, @FutureOrPresent LocalDate fechaInicio,
                                     @FutureOrPresent LocalDate fechaFinal) {
+        int anioTemporada = fechaCelebracion.getYear();
+        Optional<Temporada> temporadaOpt = repositorioTemporada.buscarPorAnio(anioTemporada);
+        Temporada temporada;
+        if (temporadaOpt.isPresent()) {
+            temporada = temporadaOpt.get();
+        } else {
+            temporada = new Temporada(anioTemporada);
+            repositorioTemporada.crear(temporada);
+        }
         Actividad actividad = new Actividad(tituloCorto, descripcion, precio, numPlazas, fechaCelebracion, fechaInicio, fechaFinal);
+        actividad.setTemporada(temporada);
+        if (actividad.getTemporada() == null) {
+            throw new IllegalStateException("La temporada no puede ser null antes de persistir la actividad.");
+        }
         repositorioActividad.crear(actividad);
         return actividad;
         /*
@@ -125,15 +143,13 @@ public class ServicioProyecto {
     public void crearSolicitud(@Positive long idActividad, @NotBlank String dniSocio, @Min(0) @Max(5) int num_acomp) {
         Actividad actividad = repositorioActividad.buscarPorId(idActividad)
                 .orElseThrow(ActividadNoRegistrada::new);
-
         Usuario socio = repositorioUsuario.buscarPorDni(dniSocio)
                 .orElseThrow(UsuarioNoRegistrado::new);
 
-        // Verifica que no exista una solicitud previa
-        for (Solicitudes solicitud : actividad.getSolicitudes()) {
-            if (solicitud.getUsuario().getDni().equals(dniSocio)) {
-                throw new UsuarioYaRegistrado();
-            }
+        boolean solicitudPrevia = actividad.getSolicitudes().stream()
+                .anyMatch(solicitud -> solicitud.getUsuario().getDni().equals(dniSocio));
+        if (solicitudPrevia) {
+            throw new UsuarioYaRegistrado();
         }
 
         Solicitudes.EstadoSolicitud estadoSolicitud = socio.getCuota() ?
@@ -142,7 +158,7 @@ public class ServicioProyecto {
 
         Solicitudes solicitud = new Solicitudes(actividad, socio, num_acomp, estadoSolicitud);
         actividad.altaSolicitud(solicitud);
-        repositorioActividad.actualizar(actividad);
+        repositorioActividad.actualizar(actividad); // Asegúrate de que esto persista correctamente la relación
         repositorioSolicitudes.crear(solicitud);
         /*
         Actividad actividad = actividades.get(idActividad);

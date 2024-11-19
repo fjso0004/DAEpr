@@ -14,7 +14,7 @@ public class RepositorioTemporada {
     EntityManager em;
 
     public void crear(Temporada temporada) {
-        em.persist(temporada);
+        em.merge(temporada);
         em.flush();
     }
 

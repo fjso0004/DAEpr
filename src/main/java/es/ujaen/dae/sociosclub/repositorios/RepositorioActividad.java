@@ -14,7 +14,7 @@ public class RepositorioActividad {
     EntityManager em;
 
     public void crear(Actividad actividad) {
-        em.merge(actividad);
+        em.persist(actividad);
         em.flush();
     }
 
@@ -22,9 +22,8 @@ public class RepositorioActividad {
         return Optional.ofNullable(em.find(Actividad.class, id));
     }
 
-    //Completar
     public List<Actividad> buscarTodas() {
-        return null;
+        return em.createQuery("SELECT a FROM Actividad a", Actividad.class).getResultList();
     }
 
     public void actualizar(Actividad actividad) {
