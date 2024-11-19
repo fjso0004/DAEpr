@@ -1,13 +1,10 @@
 package es.ujaen.dae.sociosclub.repositorios;
-
-
 import es.ujaen.dae.sociosclub.entidades.Usuario;
 import es.ujaen.dae.sociosclub.excepciones.UsuarioYaRegistrado;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
-
 import java.util.Optional;
 
 @Transactional

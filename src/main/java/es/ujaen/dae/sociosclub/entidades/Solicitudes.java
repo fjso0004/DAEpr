@@ -1,14 +1,14 @@
 package es.ujaen.dae.sociosclub.entidades;
-
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-
 import java.time.LocalDate;
 
+@Entity
 public class Solicitudes {
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id = 0;
 
     @Min(value = 0)
@@ -28,6 +28,7 @@ public class Solicitudes {
     private Actividad actividad;
 
     @NotNull
+    @ManyToOne 
     private Usuario usuario;
 
 

@@ -1,11 +1,9 @@
 package es.ujaen.dae.sociosclub.repositorios;
-
 import es.ujaen.dae.sociosclub.entidades.Actividad;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -16,7 +14,7 @@ public class RepositorioActividad {
     EntityManager em;
 
     public void crear(Actividad actividad) {
-        em.persist(actividad);
+        em.merge(actividad);
         em.flush();
     }
 

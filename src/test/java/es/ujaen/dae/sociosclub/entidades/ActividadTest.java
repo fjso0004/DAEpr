@@ -2,7 +2,6 @@ package es.ujaen.dae.sociosclub.entidades;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-
 import java.time.LocalDate;
 
 public class ActividadTest {

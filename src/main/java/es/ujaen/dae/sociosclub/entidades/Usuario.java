@@ -1,6 +1,4 @@
 package es.ujaen.dae.sociosclub.entidades;
-
-
 import es.ujaen.dae.sociosclub.util.CodificadorMd5;
 import es.ujaen.dae.sociosclub.util.ExprReg;
 import jakarta.persistence.Entity;

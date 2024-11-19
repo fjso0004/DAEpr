@@ -1,5 +1,4 @@
 package es.ujaen.dae.sociosclub.servicios;
-
 import es.ujaen.dae.sociosclub.entidades.Actividad;
 import es.ujaen.dae.sociosclub.entidades.Solicitudes;
 import es.ujaen.dae.sociosclub.entidades.Usuario;
@@ -9,12 +8,10 @@ import es.ujaen.dae.sociosclub.repositorios.RepositorioSolicitudes;
 import es.ujaen.dae.sociosclub.repositorios.RepositorioUsuario;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-
 import java.time.LocalDate;
 import java.util.*;
 

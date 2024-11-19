@@ -5,11 +5,11 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-
 @SpringBootApplication(scanBasePackages={
         "es.ujaen.dae.sociosclub.servicios",
         "es.ujaen.dae.sociosclub.repositorios"
 })
+@EntityScan(basePackages="es.ujaen.dae.sociosclub.entidades")
 @EnableCaching
 public class SociosClub {
     public static void main(String[] args) {
