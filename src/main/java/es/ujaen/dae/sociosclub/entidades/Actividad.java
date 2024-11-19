@@ -39,7 +39,7 @@ public class Actividad {
     @JoinColumn(name = "id-temporada")
     private Temporada temporada;
 
-    @OneToMany(mappedBy = "actividad", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "actividad",fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Solicitudes> solicitudes = new ArrayList<>();
 
     public Actividad() {
@@ -70,6 +70,7 @@ public class Actividad {
     public int getNumPlazas(){
         return numPlazas;
     }
+    public void setNumPlazas(int numPlazas){this.numPlazas = numPlazas;}
     public LocalDate getFechaCelebracion(){
         return fechaCelebracion;
     }
@@ -90,7 +91,7 @@ public class Actividad {
 
 
 public boolean altaSolicitud(Solicitudes solicitud) {
-    int totalSolicitantes = 1 + solicitud.getNumAcomp(); 
+    int totalSolicitantes = 1 + solicitud.getNumAcomp();
 
     if (numPlazas >= totalSolicitantes) {
         solicitudes.add(solicitud);

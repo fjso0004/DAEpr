@@ -12,7 +12,6 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import java.time.LocalDate;
@@ -140,6 +139,7 @@ public class ServicioProyecto {
         return actividad.getFechaCelebracion().isAfter(LocalDate.now());
     }
 
+    @Transactional
     public void crearSolicitud(@Positive long idActividad, @NotBlank String dniSocio, @Min(0) @Max(5) int num_acomp) {
         Actividad actividad = repositorioActividad.buscarPorId(idActividad)
                 .orElseThrow(ActividadNoRegistrada::new);
@@ -157,8 +157,9 @@ public class ServicioProyecto {
                 Solicitudes.EstadoSolicitud.PENDIENTE;
 
         Solicitudes solicitud = new Solicitudes(actividad, socio, num_acomp, estadoSolicitud);
+        solicitud.setActividad(actividad);
         actividad.altaSolicitud(solicitud);
-        repositorioActividad.actualizar(actividad); // Asegúrate de que esto persista correctamente la relación
+        repositorioActividad.actualizar(actividad);
         repositorioSolicitudes.crear(solicitud);
         /*
         Actividad actividad = actividades.get(idActividad);
@@ -225,8 +226,9 @@ public class ServicioProyecto {
         if (socio.getCuota() && actividad.getNumPlazas() > 0) {
             solicitud.setEstado(Solicitudes.EstadoSolicitud.ACEPTADA);
             actividad.borrarSolicitud(solicitud);
-            repositorioSolicitudes.actualizar(solicitud);
+            actividad.setNumPlazas(actividad.getNumPlazas() - 1);
             repositorioActividad.actualizar(actividad);
+            repositorioSolicitudes.actualizar(solicitud);
         } else {
             solicitud.setEstado(Solicitudes.EstadoSolicitud.PENDIENTE);
             repositorioSolicitudes.actualizar(solicitud);

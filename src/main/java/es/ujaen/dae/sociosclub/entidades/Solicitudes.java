@@ -24,19 +24,17 @@ public class Solicitudes {
     private EstadoSolicitud estado;
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_actividad", nullable = false)
     private Actividad actividad;
 
     @NotNull
-    @ManyToOne 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "usuario_dni", nullable = false)
     private Usuario usuario;
 
-
     public Solicitudes() {
-        this.id = generarIdSolicitud();
-        this.num_acomp = 0;
-        this.estado = EstadoSolicitud.PENDIENTE;
-        this.fechaSolicitud = LocalDate.now();
+
     }
 
     public Solicitudes(Actividad actividad, Usuario usuario, int num_acomp, EstadoSolicitud estado) {
@@ -45,6 +43,7 @@ public class Solicitudes {
         this.usuario = usuario;
         this.num_acomp = num_acomp;
         this.estado = estado;
+        this.fechaSolicitud = LocalDate.now();
     }
 
     public long getId() {
@@ -62,6 +61,7 @@ public class Solicitudes {
     }
     public Actividad getActividad() { return actividad; }
     public Usuario getUsuario() { return usuario; }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
 
     public EstadoSolicitud getEstado() { return estado; }
 

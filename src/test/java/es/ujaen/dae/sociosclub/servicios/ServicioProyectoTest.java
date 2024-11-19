@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(classes = es.ujaen.dae.sociosclub.app.SociosClub.class)
 @ActiveProfiles("test")
@@ -49,8 +50,10 @@ public class ServicioProyectoTest {
 
         Solicitudes solicitud = new Solicitudes(actividad, usuario, 0, Solicitudes.EstadoSolicitud.PENDIENTE);
         actividad.altaSolicitud(solicitud);
+        System.out.println("Actividad: " + actividad);
 
         servicioProyecto.asignarPlaza(solicitud);
+        assertEquals(Solicitudes.EstadoSolicitud.ACEPTADA, solicitud.getEstado());
 
         assertThat(solicitud.getEstado()).isEqualTo(Solicitudes.EstadoSolicitud.ACEPTADA);
         assertThat(actividad.getNumPlazas()).isEqualTo(9);
