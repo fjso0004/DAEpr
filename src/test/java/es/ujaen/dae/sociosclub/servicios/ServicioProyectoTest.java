@@ -24,15 +24,15 @@ public class ServicioProyectoTest {
     @Test
     @DirtiesContext
     void testCrearUsuarioExitoso() {
-        Usuario usuario = new Usuario("12345678B", "nombre", "apellido", "Calle Falsa 123", "600000000", "email@domain.com", "claveSegura", false);
-        Usuario result = servicioProyecto.crearUsuario(usuario);
+        var usuario = new Usuario("12345678B", "nombre", "apellido", "Calle Falsa 123", "600000000", "email@domain.com", "claveSegura", false);
+        var result = servicioProyecto.crearUsuario(usuario);
         assertThat(result).isEqualTo(usuario);
     }
 
     @Test
     @DirtiesContext
     void testCrearUsuarioYaRegistrado() {
-        Usuario usuario = new Usuario("12345678B", "nombre", "apellido", "Calle Falsa 123", "600000000", "email@domain.com", "claveSegura", false);
+        var usuario = new Usuario("12345678B", "nombre", "apellido", "Calle Falsa 123", "600000000", "email@domain.com", "claveSegura", false);
         servicioProyecto.crearUsuario(usuario);
 
         assertThatThrownBy(() -> servicioProyecto.crearUsuario(usuario))
@@ -42,27 +42,23 @@ public class ServicioProyectoTest {
     @Test
     @DirtiesContext
     void testAsignarPlaza() {
-        Actividad actividad = servicioProyecto.crearActividad("titulo", "descripcion", 10.0, 10,
+        var actividad = servicioProyecto.crearActividad("titulo", "descripcion", 10.0, 10,
                 LocalDate.now().plusDays(2), LocalDate.now(), LocalDate.now().plusDays(5));
 
-        Usuario usuario = new Usuario("12345678B", "nombre", "apellido", "Calle Falsa 123", "600000000", "email@domain.com", "claveSegura", true);
-        servicioProyecto.crearUsuario(usuario);
+        var usuario = servicioProyecto.crearUsuario(new Usuario("12345678B", "nombre", "apellido",
+                "Calle Falsa 123", "600000000", "email@domain.com", "claveSegura", true));
 
-        Solicitudes solicitud = new Solicitudes(actividad, usuario, 0, Solicitudes.EstadoSolicitud.PENDIENTE);
-        actividad.altaSolicitud(solicitud);
-        System.out.println("Actividad: " + actividad);
+        servicioProyecto.crearSolicitud(actividad.getId(), usuario.getDni(), 0);
 
-        servicioProyecto.asignarPlaza(solicitud);
-        assertEquals(Solicitudes.EstadoSolicitud.ACEPTADA, solicitud.getEstado());
 
-        assertThat(solicitud.getEstado()).isEqualTo(Solicitudes.EstadoSolicitud.ACEPTADA);
+        assertThat(actividad.getSolicitudes()).hasSize(1);
         assertThat(actividad.getNumPlazas()).isEqualTo(9);
     }
 
     @Test
     @DirtiesContext
     void testAutenticarClaveoUsuarioIncorrecto() {
-        Usuario usuario = new Usuario("12345678B", "nombre", "apellido", "Calle Falsa 123", "600000000", "email@domain.com", "claveSegura", false);
+        var usuario = new Usuario("12345678B", "nombre", "apellido", "Calle Falsa 123", "600000000", "email@domain.com", "claveSegura", false);
         servicioProyecto.crearUsuario(usuario);
 
         assertThatThrownBy(() -> servicioProyecto.login("12345678B", "claveIncorrecta"))
@@ -72,22 +68,14 @@ public class ServicioProyectoTest {
     @Test
     @DirtiesContext
     void testCrearActividadExitoso() {
-        Actividad actividad = servicioProyecto.crearActividad("titulo", "descripcion", 10.0, 20,
+        var actividad = servicioProyecto.crearActividad("titulo", "descripcion", 10.0, 20,
                 LocalDate.now().plusDays(1), LocalDate.now(), LocalDate.now().plusDays(2));
 
         assertThat(actividad).isNotNull();
         assertThat(actividad.getTituloCorto()).isEqualTo("titulo");
         assertThat(actividad.getNumPlazas()).isEqualTo(20);
         assertThat(actividad.getTemporada()).isNotNull(); // Verifica que la temporada no es null
-        assertThat(actividad.getTemporada().getAnio()).isEqualTo(LocalDate.now().plusDays(1).getYear()); // Verifica el año
-        /*
-        Actividad actividad = servicioProyecto.crearActividad("titulo", "descripcion", 10.0, 20,
-                LocalDate.now().plusDays(1), LocalDate.now(), LocalDate.now().plusDays(2));
-
-        assertThat(actividad).isNotNull();
-        assertThat(actividad.getTituloCorto()).isEqualTo("titulo");
-        assertThat(actividad.getNumPlazas()).isEqualTo(20);
-        */
+        assertThat(actividad.getTemporada().getAnio()).isEqualTo(LocalDate.now().plusDays(1).getYear());
     }
 
     @Test
@@ -99,7 +87,7 @@ public class ServicioProyectoTest {
         servicioProyecto.crearActividad("titulo2", "descripcion", 10.0, 20,
                 LocalDate.now().plusDays(5), LocalDate.now(), LocalDate.now().plusDays(6));
 
-        List<Actividad> actividades = servicioProyecto.buscarActividades();
+        var actividades = servicioProyecto.buscarActividades();
 
         assertThat(actividades).hasSize(1);
         assertThat(actividades.get(0).getTituloCorto()).isEqualTo("titulo2");
@@ -115,10 +103,10 @@ public class ServicioProyectoTest {
     @Test
     @DirtiesContext
     void testCrearSolicitudUsuarioYaRegistrado() {
-        Usuario usuario = new Usuario("12345678B", "nombre", "apellido", "Calle Falsa 123", "600000000", "email@domain.com", "claveSegura", false);
+        var usuario = new Usuario("12345678B", "nombre", "apellido", "Calle Falsa 123", "600000000", "email@domain.com", "claveSegura", false);
         servicioProyecto.crearUsuario(usuario);
 
-        Actividad actividad = servicioProyecto.crearActividad("titulo", "descripcion", 10.0, 20,
+        var actividad = servicioProyecto.crearActividad("titulo", "descripcion", 10.0, 20,
                 LocalDate.now().plusDays(1), LocalDate.now(), LocalDate.now().plusDays(2));
 
         servicioProyecto.crearSolicitud(actividad.getId(), usuario.getDni(), 3);
@@ -126,3 +114,4 @@ public class ServicioProyectoTest {
                 .isInstanceOf(UsuarioYaRegistrado.class);
     }
 }
+

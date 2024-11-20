@@ -139,7 +139,6 @@ public class ServicioProyecto {
         return actividad.getFechaCelebracion().isAfter(LocalDate.now());
     }
 
-    @Transactional
     public void crearSolicitud(@Positive long idActividad, @NotBlank String dniSocio, @Min(0) @Max(5) int num_acomp) {
         Actividad actividad = repositorioActividad.buscarPorId(idActividad)
                 .orElseThrow(ActividadNoRegistrada::new);
@@ -157,10 +156,8 @@ public class ServicioProyecto {
                 Solicitudes.EstadoSolicitud.PENDIENTE;
 
         Solicitudes solicitud = new Solicitudes(actividad, socio, num_acomp, estadoSolicitud);
-        solicitud.setActividad(actividad);
         actividad.altaSolicitud(solicitud);
         repositorioActividad.actualizar(actividad);
-        repositorioSolicitudes.crear(solicitud);
         /*
         Actividad actividad = actividades.get(idActividad);
         if (actividad == null) {

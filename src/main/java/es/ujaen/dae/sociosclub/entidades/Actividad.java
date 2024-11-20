@@ -1,4 +1,7 @@
 package es.ujaen.dae.sociosclub.entidades;
+import es.ujaen.dae.sociosclub.excepciones.ActividadNoRegistrada;
+import es.ujaen.dae.sociosclub.excepciones.PlazasNoDisponibles;
+import es.ujaen.dae.sociosclub.excepciones.SolicitudNoRegistrada;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
@@ -90,23 +93,22 @@ public class Actividad {
     }
 
 
-public boolean altaSolicitud(Solicitudes solicitud) {
-    int totalSolicitantes = 1 + solicitud.getNumAcomp();
+    public void altaSolicitud(Solicitudes solicitud) {
+        int totalSolicitantes = 1 + solicitud.getNumAcomp();
 
-    if (numPlazas >= totalSolicitantes) {
-        solicitudes.add(solicitud);
-        solicitud.setActividad(this); 
-        numPlazas -= totalSolicitantes; 
-        return true; 
-    } else {
-        System.out.println("No hay suficientes plazas disponibles para esta solicitud.");
-        return false; 
+        if (numPlazas >= totalSolicitantes) {
+            solicitud.setActividad(this);
+            this.solicitudes.add(solicitud);
+            this.numPlazas -= totalSolicitantes;
+        } else {
+            throw new PlazasNoDisponibles();
+        }
     }
-}
 
     public void borrarSolicitud(Solicitudes solicitud){
-        solicitud.setActividad(null);
-        solicitudes.remove(solicitud);
+        if (this.solicitudes.remove(solicitud)) {
+            solicitud.setActividad(null);
+        }
     }
 
     public List<Solicitudes> getSolicitudes(){
@@ -115,11 +117,6 @@ public boolean altaSolicitud(Solicitudes solicitud) {
 
     public List<Solicitudes> getSolicitudesPendientes(){
         return this.solicitudes.stream().filter(solicitudes -> solicitudes.getEstado().equals(Solicitudes.EstadoSolicitud.PENDIENTE)).collect(Collectors.toList());
-    }
-
-    public int generarIdActividad(){
-        id++;
-        return id;
     }
 
     public int getId(){

@@ -1,5 +1,6 @@
 package es.ujaen.dae.sociosclub.repositorios;
 import es.ujaen.dae.sociosclub.entidades.Solicitudes;
+import es.ujaen.dae.sociosclub.excepciones.SolicitudNoRegistrada;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
@@ -14,6 +15,8 @@ public class RepositorioSolicitudes {
     EntityManager em;
 
     public void crear(Solicitudes solicitud) {
+        System.out.println("Actividad asociada: " + solicitud.getActividad());
+        System.out.println("Usuario asociado: " + solicitud.getUsuario());
         em.persist(solicitud);
         em.flush();
     }

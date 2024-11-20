@@ -23,7 +23,7 @@ public class Solicitudes {
 
     private EstadoSolicitud estado;
 
-    @NotNull
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_actividad", nullable = false)
     private Actividad actividad;
@@ -38,7 +38,6 @@ public class Solicitudes {
     }
 
     public Solicitudes(Actividad actividad, Usuario usuario, int num_acomp, EstadoSolicitud estado) {
-        this();
         this.actividad = actividad;
         this.usuario = usuario;
         this.num_acomp = num_acomp;
@@ -62,6 +61,7 @@ public class Solicitudes {
     public Actividad getActividad() { return actividad; }
     public Usuario getUsuario() { return usuario; }
     public void setUsuario(Usuario usuario) { this.usuario = usuario; }
+    public Actividad getActividad(Actividad actividad) {return actividad;}
 
     public EstadoSolicitud getEstado() { return estado; }
 
@@ -69,8 +69,4 @@ public class Solicitudes {
         this.estado = estado;
     }
 
-    private long generarIdSolicitud(){
-        id++;
-        return id;
-    }
 }
