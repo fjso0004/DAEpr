@@ -1,12 +1,15 @@
 package es.ujaen.dae.sociosclub.entidades;
+
+import jakarta.persistence.*;
 import es.ujaen.dae.sociosclub.util.CodificadorMd5;
 import es.ujaen.dae.sociosclub.util.ExprReg;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.CascadeType;
 import jakarta.validation.constraints.*;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 
-@Entity
+import java.beans.Expression;
+import java.util.ArrayList;
+import java.util.List;
+
 public class Usuario {
 
     @Id
@@ -21,43 +24,38 @@ public class Usuario {
 
     private String direccion;
 
-    String tlf;
-
-    @Email
-    String email;
+    private String tlf;
+    private String email;
 
     @Size(min = 8)
     private String clave;
 
     boolean cuotaPagada;
 
-    public Usuario(){
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    private List<Solicitudes> solicitudes = new ArrayList<>();
 
-    }
 
-    public Usuario(String dni, String nombre, String apellidos, String direccion, String tlf, String email, String clave, boolean cuotaPagada){
-        this.dni = dni;
-        this.nombre = nombre;
-        this.apellidos = apellidos;
-        this.tlf = tlf;
-        this.email = email;
-        this.direccion = direccion;
-        this.clave = clave;
-        this.cuotaPagada= cuotaPagada;
-    }
+public Usuario(String dni, String nombre, String apellidos, String dirección, String tlf, String email, String clave, boolean cuotaPagada){
+    this.dni = dni;
+    this.nombre = nombre;
+    this.apellidos = apellidos;
+    this.tlf = tlf;
+    this.email = email;
+    this.clave = clave;
+    this.cuotaPagada= cuotaPagada;
+}
 
 public boolean claveValida(String clave){
     return this.clave.equals(CodificadorMd5.codificar(clave));
 }
 
-public String getDni() {return dni;}
+public String getDni() {
+    return dni;
+}
 
 public String getNombre() {
     return nombre;
-}
-
-public String getApellidos() {
-    return apellidos;
 }
 
 public String getTlf() {

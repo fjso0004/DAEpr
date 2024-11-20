@@ -1,23 +1,21 @@
 package es.ujaen.dae.sociosclub.entidades;
+
 import jakarta.persistence.*;
 import java.util.List;
 import java.util.ArrayList;
 
-@Entity
 public class Temporada {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int anio;
 
-    @OneToMany
+    @OneToMany(mappedBy = "temporada", cascade = CascadeType.ALL)
     private List<Actividad> actividades = new ArrayList<>();
 
-    public Temporada() {
-
-    }
 
     public Temporada(int anio) {
         this.anio = anio;
-        this.actividades = new ArrayList<>();
+        this.actividades = new ArrayList<>(); 
     }
 
 
@@ -30,7 +28,7 @@ public class Temporada {
         return anio;
     }
 
-    public void setAnio(int anio) {
+    public void setAnio(int ano) {
         this.anio = anio;
     }
 
