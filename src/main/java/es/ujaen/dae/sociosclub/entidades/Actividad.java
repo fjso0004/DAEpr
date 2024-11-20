@@ -1,24 +1,23 @@
 package es.ujaen.dae.sociosclub.entidades;
-
+import es.ujaen.dae.sociosclub.excepciones.ActividadNoRegistrada;
+import es.ujaen.dae.sociosclub.excepciones.PlazasNoDisponibles;
+import es.ujaen.dae.sociosclub.excepciones.SolicitudNoRegistrada;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.FutureOrPresent;
-
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Entity
 public class Actividad {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @NotBlank
     private String tituloCorto;
@@ -38,18 +37,20 @@ public class Actividad {
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
 
+    @NotNull
     @ManyToOne
-    @JoinColumn(name = "temporada_id")
+    @JoinColumn(name = "id-temporada")
     private Temporada temporada;
 
-    @OneToMany(mappedBy = "actividad", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "actividad",fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Solicitudes> solicitudes = new ArrayList<>();
-    private  List<Usuario> socios = new ArrayList<>();
 
+    public Actividad() {
+
+    }
 
     public Actividad(String tituloCorto, String descripcion, double precio, int numPlazas, LocalDate fechaCelebracion, LocalDate fechaInicio,
                      LocalDate fechaFin) {
-        this.id = generarIdActividad();
         this.tituloCorto = tituloCorto;
         this.descripcion = descripcion;
         this.precio = precio;
@@ -72,6 +73,7 @@ public class Actividad {
     public int getNumPlazas(){
         return numPlazas;
     }
+    public void setNumPlazas(int numPlazas){this.numPlazas = numPlazas;}
     public LocalDate getFechaCelebracion(){
         return fechaCelebracion;
     }
@@ -86,27 +88,27 @@ public class Actividad {
         return temporada;
     }
 
-  public void setTemporada(Temporada temporada) {
+    public void setTemporada(Temporada temporada) {
         this.temporada = temporada;
     }
 
-    public List<Usuario> getSocios(){
-        return new ArrayList<>(socios);
-    }
 
-    public synchronized void nuevoSocio(Usuario usuario){
-        if (numPlazas > 0) {
-            socios.add(usuario);
-            numPlazas--;
+    public void altaSolicitud(Solicitudes solicitud) {
+        int totalSolicitantes = 1 + solicitud.getNumAcomp();
+
+        if (numPlazas >= totalSolicitantes) {
+            solicitud.setActividad(this);
+            this.solicitudes.add(solicitud);
+            this.numPlazas -= totalSolicitantes;
+        } else {
+            throw new PlazasNoDisponibles();
         }
     }
 
-    public void altaSolicitud(Solicitudes solicitud){
-        solicitudes.add(solicitud);
-    }
-
     public void borrarSolicitud(Solicitudes solicitud){
-        solicitudes.remove(solicitud);
+        if (this.solicitudes.remove(solicitud)) {
+            solicitud.setActividad(null);
+        }
     }
 
     public List<Solicitudes> getSolicitudes(){
@@ -117,12 +119,8 @@ public class Actividad {
         return this.solicitudes.stream().filter(solicitudes -> solicitudes.getEstado().equals(Solicitudes.EstadoSolicitud.PENDIENTE)).collect(Collectors.toList());
     }
 
-    public long generarIdActividad(){
-        id++;
+    public int getId(){
         return id;
     }
 
-    public long getId(){
-        return id;
-    }
 }

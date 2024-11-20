@@ -1,22 +1,16 @@
 package es.ujaen.dae.sociosclub.entidades;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.time.LocalDate;
 
+@Entity
 public class Solicitudes {
-
-    public enum EstadoSolicitud {
-        PENDIENTE, ACEPTADA, RECHAZADA
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id = 0;
 
     @Min(value = 0)
     @Max(value = 5)
@@ -28,26 +22,26 @@ public class Solicitudes {
     @Enumerated(EnumType.STRING)
     private EstadoSolicitud estado;
 
-    @ManyToOne
-    @JoinColumn(name = "actividad_id")
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_actividad", nullable = false)
     private Actividad actividad;
 
-    @ManyToOne
-    @JoinColumn(name = "usuario_dni")
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "usuario_dni", nullable = false)
     private Usuario usuario;
 
-
     public Solicitudes() {
-        this.id = generarIdSolicitud();
-        this.num_acomp = num_acomp;
-        this.estado = EstadoSolicitud.PENDIENTE;
-        this.fechaSolicitud = LocalDate.now();
+
     }
 
-    public Solicitudes(Actividad actividad, Usuario usuario ) {
-        this();
+    public Solicitudes(Actividad actividad, Usuario usuario, int num_acomp, EstadoSolicitud estado) {
         this.actividad = actividad;
         this.usuario = usuario;
+        this.num_acomp = num_acomp;
+        this.estado = estado;
+        this.fechaSolicitud = LocalDate.now();
     }
 
     public long getId() {
@@ -60,8 +54,13 @@ public class Solicitudes {
         this.num_acomp = num_acomp;
     }
     public LocalDate getFechaSolicitud() { return fechaSolicitud; }
+    public void setActividad(Actividad actividad) {
+        this.actividad = actividad;
+    }
     public Actividad getActividad() { return actividad; }
     public Usuario getUsuario() { return usuario; }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
+    public Actividad getActividad(Actividad actividad) {return actividad;}
 
     public EstadoSolicitud getEstado() { return estado; }
 
@@ -69,8 +68,4 @@ public class Solicitudes {
         this.estado = estado;
     }
 
-    private long generarIdSolicitud(){
-        id++;
-        return id;
-    }
 }
