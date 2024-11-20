@@ -139,7 +139,14 @@ public class ServicioProyecto {
         return actividad.getFechaCelebracion().isAfter(LocalDate.now());
     }
 
-    public void crearSolicitud(@Positive long idActividad, @NotBlank String dniSocio, @Min(0) @Max(5) int num_acomp) {
+    @Transactional
+    public Actividad buscarActividadPorId(int idActividad) {
+        return repositorioActividad.buscarPorId(idActividad)
+                .orElseThrow(ActividadNoRegistrada::new);
+    }
+
+    @Transactional
+    public void crearSolicitud(int idActividad, @NotBlank String dniSocio, @Min(0) @Max(5) int num_acomp) {
         Actividad actividad = repositorioActividad.buscarPorId(idActividad)
                 .orElseThrow(ActividadNoRegistrada::new);
         Usuario socio = repositorioUsuario.buscarPorDni(dniSocio)
@@ -156,8 +163,11 @@ public class ServicioProyecto {
                 Solicitudes.EstadoSolicitud.PENDIENTE;
 
         Solicitudes solicitud = new Solicitudes(actividad, socio, num_acomp, estadoSolicitud);
+        repositorioSolicitudes.crear(solicitud);
+
         actividad.altaSolicitud(solicitud);
         repositorioActividad.actualizar(actividad);
+
         /*
         Actividad actividad = actividades.get(idActividad);
         if (actividad == null) {
@@ -189,7 +199,7 @@ public class ServicioProyecto {
     }
 
 
-    public void modificarSolicitud(@Positive long idActividad, @Positive long idSolicitud, @Positive int numAcomp) {
+    public void modificarSolicitud(int idActividad, @Positive long idSolicitud, @Positive int numAcomp) {
         Actividad actividad = repositorioActividad.buscarPorId(idActividad)
                 .orElseThrow(ActividadNoRegistrada::new);
 
@@ -213,14 +223,17 @@ public class ServicioProyecto {
         }
     }
 
+    @Transactional
     public void asignarPlaza(@NotNull Solicitudes solicitud) {
         Actividad actividad = solicitud.getActividad();
         if (actividad == null) {
             throw new ActividadNoRegistrada();
         }
-        Usuario socio = solicitud.getUsuario();
 
-        if (socio.getCuota() && actividad.getNumPlazas() > 0) {
+        Usuario socio = solicitud.getUsuario();
+        boolean cuotaPagada = socio.getCuota(); // Asegurarse de cargar datos `LAZY`
+
+        if (cuotaPagada && actividad.getNumPlazas() > 0) {
             solicitud.setEstado(Solicitudes.EstadoSolicitud.ACEPTADA);
             actividad.borrarSolicitud(solicitud);
             actividad.setNumPlazas(actividad.getNumPlazas() - 1);
@@ -257,7 +270,7 @@ public class ServicioProyecto {
         */
     }
 
-    public List<Solicitudes> obtenerSolicitudesPendientes(@Positive long idActividad) {
+    public List<Solicitudes> obtenerSolicitudesPendientes(int idActividad) {
         Actividad actividad = repositorioActividad.buscarPorId(idActividad)
                 .orElseThrow(ActividadNoRegistrada::new);
         return actividad.getSolicitudesPendientes();

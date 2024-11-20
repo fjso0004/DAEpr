@@ -24,12 +24,12 @@ public class Solicitudes {
     private EstadoSolicitud estado;
 
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "id_actividad", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_actividad")
     private Actividad actividad;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "usuario_dni", nullable = false)
     private Usuario usuario;
 
@@ -60,11 +60,7 @@ public class Solicitudes {
     }
     public Actividad getActividad() { return actividad; }
     public Usuario getUsuario() { return usuario; }
-    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
-    public Actividad getActividad(Actividad actividad) {return actividad;}
-
     public EstadoSolicitud getEstado() { return estado; }
-
     public void setEstado(EstadoSolicitud estado) {
         this.estado = estado;
     }

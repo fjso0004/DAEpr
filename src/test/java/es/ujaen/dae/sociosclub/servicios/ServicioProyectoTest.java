@@ -50,10 +50,31 @@ public class ServicioProyectoTest {
 
         servicioProyecto.crearSolicitud(actividad.getId(), usuario.getDni(), 0);
 
+        var actividadRecargada = servicioProyecto.buscarActividadPorId(actividad.getId());
+        var solicitud = actividadRecargada.getSolicitudes().get(0);
 
-        assertThat(actividad.getSolicitudes()).hasSize(1);
-        assertThat(actividad.getNumPlazas()).isEqualTo(9);
+        servicioProyecto.asignarPlaza(solicitud);
+
+        assertThat(solicitud.getEstado()).isEqualTo(Solicitudes.EstadoSolicitud.ACEPTADA);
+        assertThat(actividadRecargada.getNumPlazas()).isEqualTo(8);
     }
+
+    @Test
+    @DirtiesContext
+    void testCrearSolicitudExitoso() {
+        var actividad = servicioProyecto.crearActividad("titulo", "descripcion", 10.0, 10,
+                LocalDate.now().plusDays(2), LocalDate.now(), LocalDate.now().plusDays(5));
+
+        var usuario = servicioProyecto.crearUsuario(new Usuario("12345678B", "nombre", "apellido",
+                "Calle Falsa 123", "600000000", "email@domain.com", "claveSegura", true));
+
+        servicioProyecto.crearSolicitud(actividad.getId(), usuario.getDni(), 0);
+
+        var actividadRecargada = servicioProyecto.buscarActividadPorId(actividad.getId());
+
+        assertThat(actividadRecargada.getSolicitudes()).hasSize(1);
+    }
+
 
     @Test
     @DirtiesContext
@@ -96,7 +117,7 @@ public class ServicioProyectoTest {
     @Test
     @DirtiesContext
     void testCrearSolicitudActividadNoRegistrada() {
-        assertThatThrownBy(() -> servicioProyecto.crearSolicitud(999L, "12345678B", 4))
+        assertThatThrownBy(() -> servicioProyecto.crearSolicitud(999, "12345678B", 4))
                 .isInstanceOf(ActividadNoRegistrada.class);
     }
 

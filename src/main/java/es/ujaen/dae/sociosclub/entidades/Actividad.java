@@ -42,7 +42,7 @@ public class Actividad {
     @JoinColumn(name = "id-temporada")
     private Temporada temporada;
 
-    @OneToMany(mappedBy = "actividad",fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "actividad",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Solicitudes> solicitudes = new ArrayList<>();
 
     public Actividad() {
@@ -77,12 +77,6 @@ public class Actividad {
     public LocalDate getFechaCelebracion(){
         return fechaCelebracion;
     }
-    public LocalDate getFechaInicio(){
-        return fechaInicio;
-    }
-    public LocalDate getFechaFin(){
-        return fechaFin;
-    }
 
     public Temporada getTemporada() {
         return temporada;
@@ -97,8 +91,8 @@ public class Actividad {
         int totalSolicitantes = 1 + solicitud.getNumAcomp();
 
         if (numPlazas >= totalSolicitantes) {
-            solicitud.setActividad(this);
             this.solicitudes.add(solicitud);
+            solicitud.setActividad(this);
             this.numPlazas -= totalSolicitantes;
         } else {
             throw new PlazasNoDisponibles();

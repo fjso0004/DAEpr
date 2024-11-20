@@ -15,22 +15,22 @@ public class RepositorioSolicitudes {
     EntityManager em;
 
     public void crear(Solicitudes solicitud) {
-        System.out.println("Actividad asociada: " + solicitud.getActividad());
-        System.out.println("Usuario asociado: " + solicitud.getUsuario());
         em.persist(solicitud);
         em.flush();
     }
 
-    public Optional<Solicitudes> buscarPorId(long id) {
-        return Optional.ofNullable(em.find(Solicitudes.class, id));
+    public Optional<Solicitudes> buscarPorId(Long id) {
+        Solicitudes solicitud = em.find(Solicitudes.class, id);
+        if (solicitud != null) {
+            solicitud.getUsuario().getDni();
+            solicitud.getActividad().getId();
+        }
+        return Optional.ofNullable(solicitud);
     }
-
-    //Completar
     public List<Solicitudes> buscarPorActividadId(long actividadId) {
-        //return em.createQuery("SELECT s FROM Solicitudes s WHERE s.actividad.id = :actividadId", Solicitudes.class)
-        //        .setParameter("actividadId", actividadId)
-        //        .getResultList();
-        return null;
+        return em.createQuery("SELECT s FROM Solicitudes s WHERE s.actividad.id = :actividadId", Solicitudes.class)
+                .setParameter("actividadId", actividadId)
+                .getResultList();
     }
 
     public void actualizar(Solicitudes solicitud) {

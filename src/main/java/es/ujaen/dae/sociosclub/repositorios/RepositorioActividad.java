@@ -18,8 +18,12 @@ public class RepositorioActividad {
         em.flush();
     }
 
-    public Optional<Actividad> buscarPorId(long id) {
-        return Optional.ofNullable(em.find(Actividad.class, id));
+    public Optional<Actividad> buscarPorId(int id) {
+        Actividad actividad = em.find(Actividad.class, id);
+        if (actividad != null) {
+            actividad.getSolicitudes().size();
+        }
+        return Optional.ofNullable(actividad);
     }
 
     public List<Actividad> buscarTodas() {
