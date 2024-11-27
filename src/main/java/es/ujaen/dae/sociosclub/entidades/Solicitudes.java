@@ -28,7 +28,6 @@ public class Solicitudes {
     @JoinColumn(name = "id_actividad")
     private Actividad actividad;
 
-    @NotNull
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "usuario_dni", nullable = false)
     private Usuario usuario;
@@ -37,11 +36,11 @@ public class Solicitudes {
 
     }
 
-    public Solicitudes(Actividad actividad, Usuario usuario, int num_acomp, EstadoSolicitud estado) {
+    public Solicitudes(Actividad actividad, Usuario usuario, int num_acomp) {
         this.actividad = actividad;
         this.usuario = usuario;
         this.num_acomp = num_acomp;
-        this.estado = estado;
+        this.estado = usuario.getCuota() ? EstadoSolicitud.ACEPTADA : EstadoSolicitud.PENDIENTE;
         this.fechaSolicitud = LocalDate.now();
     }
 

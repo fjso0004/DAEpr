@@ -1,6 +1,5 @@
 package es.ujaen.dae.sociosclub.repositorios;
 import es.ujaen.dae.sociosclub.entidades.Solicitudes;
-import es.ujaen.dae.sociosclub.excepciones.SolicitudNoRegistrada;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
@@ -16,7 +15,6 @@ public class RepositorioSolicitudes {
 
     public void crear(Solicitudes solicitud) {
         em.persist(solicitud);
-        em.flush();
     }
 
     public Optional<Solicitudes> buscarPorId(Long id) {
@@ -35,12 +33,10 @@ public class RepositorioSolicitudes {
 
     public void actualizar(Solicitudes solicitud) {
         em.merge(solicitud);
-        em.flush();
     }
 
     public void eliminar(Solicitudes solicitud) {
         em.remove(em.contains(solicitud) ? solicitud : em.merge(solicitud));
-        em.flush();
     }
 }
 

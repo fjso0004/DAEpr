@@ -29,28 +29,16 @@ public class ServicioProyecto {
     @Autowired
     RepositorioTemporada repositorioTemporada;
 
-    private Map<String, Usuario> usuarios;
-    private Map<Integer, Actividad> actividades;
-
 
     private static final Usuario administrador = new Usuario("12345678Z", "admin", "-", "-", "659123456",
              "admin@sociosclub.es", "SuperUser", true);
 
-    public ServicioProyecto() {
-        usuarios = new TreeMap<>();
-        actividades = new TreeMap<>();
-    }
+    public ServicioProyecto() {}
 
     public Usuario crearUsuario(@NotNull @Valid Usuario usuario) {
-        if (usuario.getDni().equals(administrador.getDni()))
-            throw new UsuarioYaRegistrado();
-/*
-        if (usuarios.containsKey(usuario.getDni())) {
+        if (usuario.getDni().equals(administrador.getDni())){
             throw new UsuarioYaRegistrado();
         }
-        usuarios.put(usuario.getDni(), usuario);
-        return usuario;
- */
         repositorioUsuario.crear(usuario);
         return usuario;
     }
@@ -61,13 +49,6 @@ public class ServicioProyecto {
             throw new ClaveoUsuarioIncorrecto("Usuario o clave incorrecto");
         }
         return true;
-        /*
-        Usuario usuario = usuarios.get(dni);
-        if (usuario == null || !usuario.getDni().equals(dni) || !usuario.getClave().equals(clave)) {
-            throw new ClaveoUsuarioIncorrecto("Usuario o clave incorrecto");
-        }
-        return true;
-        */
     }
 
     public Usuario buscarUsuario(Usuario administrador, @NotBlank String dni) {
@@ -77,18 +58,6 @@ public class ServicioProyecto {
         } else {
             throw new OperacionDeAdmin();
         }
-        /*
-        if (administrador.getNombre().equals("admin")){
-            Usuario usuario = usuarios.get(dni);
-            if (usuario == null) {
-                throw new UsuarioYaRegistrado();
-            }
-            return usuario;
-
-        }else {
-            throw new OperacionDeAdmin();
-        }
-        */
     }
 
     public Actividad crearActividad(@NotBlank String tituloCorto, @NotBlank String descripcion, @Positive double precio, @Positive int numPlazas,
@@ -105,30 +74,12 @@ public class ServicioProyecto {
         }
         Actividad actividad = new Actividad(tituloCorto, descripcion, precio, numPlazas, fechaCelebracion, fechaInicio, fechaFinal);
         actividad.setTemporada(temporada);
-        if (actividad.getTemporada() == null) {
-            throw new IllegalStateException("La temporada no puede ser null antes de persistir la actividad.");
-        }
         repositorioActividad.crear(actividad);
         return actividad;
-        /*
-        Actividad actividad = new Actividad(tituloCorto, descripcion, precio, numPlazas, fechaCelebracion, fechaInicio, fechaFinal);
-        //actividad.generarIdActividad();
-        actividades.put(actividad.getId(), actividad);
-        return actividad;
-        */
     }
 
 
     public List<Actividad> buscarActividades() {
-        /*
-        List<Actividad> actividadesFiltradas = new ArrayList<>();
-        for (Actividad actividad : actividades.values()) {
-            if (actividadValida(actividad)) {
-                actividadesFiltradas.add(actividad);
-            }
-        }
-        return actividadesFiltradas;
-        */
         return repositorioActividad.buscarTodas().stream()
                 .filter(this::actividadValida)
                 .toList();
@@ -152,51 +103,13 @@ public class ServicioProyecto {
         Usuario socio = repositorioUsuario.buscarPorDni(dniSocio)
                 .orElseThrow(UsuarioNoRegistrado::new);
 
-        boolean solicitudPrevia = actividad.getSolicitudes().stream()
-                .anyMatch(solicitud -> solicitud.getUsuario().getDni().equals(dniSocio));
-        if (solicitudPrevia) {
-            throw new UsuarioYaRegistrado();
-        }
-
-        Solicitudes.EstadoSolicitud estadoSolicitud = socio.getCuota() ?
-                Solicitudes.EstadoSolicitud.ACEPTADA :
-                Solicitudes.EstadoSolicitud.PENDIENTE;
-
-        Solicitudes solicitud = new Solicitudes(actividad, socio, num_acomp, estadoSolicitud);
+        Solicitudes solicitud = new Solicitudes(actividad, socio, num_acomp);
         repositorioSolicitudes.crear(solicitud);
 
         actividad.altaSolicitud(solicitud);
         repositorioActividad.actualizar(actividad);
-
-        /*
-        Actividad actividad = actividades.get(idActividad);
-        if (actividad == null) {
-            throw new ActividadNoRegistrada();
-        }
-
-        Usuario socio = usuarios.get(dniSocio);
-
-        if (socio == null) {
-            throw new UsuarioNoRegistrado();
-        }
-
-        for (Solicitudes solicitud : actividad.getSolicitudes()) {
-            if (solicitud.getUsuario().getDni().equals(dniSocio)) {
-                throw new UsuarioYaRegistrado();
-            }
-        }
-
-        Solicitudes.EstadoSolicitud estadoSolicitud;
-        if (socio.getCuota()) {
-           estadoSolicitud = Solicitudes.EstadoSolicitud.ACEPTADA;
-        } else {
-            estadoSolicitud = Solicitudes.EstadoSolicitud.PENDIENTE;
-        }
-
-        Solicitudes solicitud = new Solicitudes(actividad, socio, num_acomp, estadoSolicitud);
-        actividad.altaSolicitud(solicitud);
-        */
     }
+
 
 
     public void modificarSolicitud(int idActividad, @Positive long idSolicitud, @Positive int numAcomp) {
@@ -208,12 +121,6 @@ public class ServicioProyecto {
 
         solicitud.setNumAcomp(numAcomp);
         repositorioSolicitudes.actualizar(solicitud);
-        /*
-        Actividad actividad = actividades.get(idActividad);
-        if (actividad == null) {
-            throw new ActividadNoRegistrada();
-        }
-         */
     }
 
     public void marcarCuota(@NotNull Usuario user) {
@@ -243,20 +150,6 @@ public class ServicioProyecto {
             solicitud.setEstado(Solicitudes.EstadoSolicitud.PENDIENTE);
             repositorioSolicitudes.actualizar(solicitud);
         }
-        /*
-        Actividad actividad = solicitud.getActividad();
-        if (actividad == null) {
-            throw new ActividadNoRegistrada();
-        }
-        Usuario socio = solicitud.getUsuario();
-
-        if (socio.getCuota() && actividad.getNumPlazas() > 0) {
-            solicitud.setEstado(Solicitudes.EstadoSolicitud.ACEPTADA);
-            actividad.borrarSolicitud(solicitud);
-        } else {
-            solicitud.setEstado(Solicitudes.EstadoSolicitud.PENDIENTE);
-        }
-        */
     }
 
     public void rechazarPlaza(@NotNull Solicitudes solicitud) {
@@ -264,22 +157,11 @@ public class ServicioProyecto {
         solicitud.getActividad().borrarSolicitud(solicitud);
         repositorioSolicitudes.actualizar(solicitud);
         repositorioActividad.actualizar(solicitud.getActividad());
-        /*
-        solicitud.setEstado(Solicitudes.EstadoSolicitud.RECHAZADA);
-        solicitud.getActividad().borrarSolicitud(solicitud);
-        */
     }
 
     public List<Solicitudes> obtenerSolicitudesPendientes(int idActividad) {
         Actividad actividad = repositorioActividad.buscarPorId(idActividad)
                 .orElseThrow(ActividadNoRegistrada::new);
         return actividad.getSolicitudesPendientes();
-        /*
-        Actividad actividad = actividades.get(idActividad);
-        if (actividad == null) {
-            throw new ActividadNoRegistrada();
-        }
-        return actividad.getSolicitudesPendientes();
-         */
     }
 }

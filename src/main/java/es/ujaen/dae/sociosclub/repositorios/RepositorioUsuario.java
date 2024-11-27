@@ -18,7 +18,6 @@ public class RepositorioUsuario {
             throw new UsuarioYaRegistrado();
         }
         em.persist(usuario);
-        em.flush();
     }
 
     public Optional<Usuario> buscarPorDni(String dni) {
@@ -27,12 +26,10 @@ public class RepositorioUsuario {
 
     public void actualizar(Usuario usuario) {
         em.merge(usuario);
-        em.flush();
     }
 
     public void eliminar(Usuario usuario) {
         em.remove(em.contains(usuario) ? usuario : em.merge(usuario));
-        em.flush();
     }
 
 }

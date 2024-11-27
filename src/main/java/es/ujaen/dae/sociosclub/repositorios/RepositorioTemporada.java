@@ -15,26 +15,21 @@ public class RepositorioTemporada {
 
     public void crear(Temporada temporada) {
         em.merge(temporada);
-        em.flush();
     }
 
     public Optional<Temporada> buscarPorAnio(int anio) {
         return Optional.ofNullable(em.find(Temporada.class, anio));
     }
 
-    //Completar
     public List<Temporada> buscarTodas() {
-        //return em.createQuery("SELECT t FROM Temporada t", Temporada.class).getResultList();
-        return null;
+        return em.createQuery("SELECT t FROM Temporada t", Temporada.class).getResultList();
     }
 
     public void actualizar(Temporada temporada) {
         em.merge(temporada);
-        em.flush();
     }
 
     public void eliminar(Temporada temporada) {
         em.remove(em.contains(temporada) ? temporada : em.merge(temporada));
-        em.flush();
     }
 }

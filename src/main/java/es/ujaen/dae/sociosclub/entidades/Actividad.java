@@ -1,7 +1,6 @@
 package es.ujaen.dae.sociosclub.entidades;
-import es.ujaen.dae.sociosclub.excepciones.ActividadNoRegistrada;
 import es.ujaen.dae.sociosclub.excepciones.PlazasNoDisponibles;
-import es.ujaen.dae.sociosclub.excepciones.SolicitudNoRegistrada;
+import es.ujaen.dae.sociosclub.excepciones.UsuarioYaRegistrado;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
@@ -37,7 +36,6 @@ public class Actividad {
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
 
-    @NotNull
     @ManyToOne
     @JoinColumn(name = "id-temporada")
     private Temporada temporada;
@@ -88,8 +86,14 @@ public class Actividad {
 
 
     public void altaSolicitud(Solicitudes solicitud) {
-        int totalSolicitantes = 1 + solicitud.getNumAcomp();
+        boolean solicitudPrevia = this.solicitudes.stream()
+                .anyMatch(s -> s.getUsuario().getDni().equals(solicitud.getUsuario().getDni()));
 
+        if (solicitudPrevia) {
+            throw new UsuarioYaRegistrado();
+        }
+
+        int totalSolicitantes = 1 + solicitud.getNumAcomp();
         if (numPlazas >= totalSolicitantes) {
             this.solicitudes.add(solicitud);
             solicitud.setActividad(this);
@@ -98,6 +102,7 @@ public class Actividad {
             throw new PlazasNoDisponibles();
         }
     }
+
 
     public void borrarSolicitud(Solicitudes solicitud){
         if (this.solicitudes.remove(solicitud)) {

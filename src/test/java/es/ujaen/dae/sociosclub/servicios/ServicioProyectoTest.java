@@ -1,5 +1,4 @@
 package es.ujaen.dae.sociosclub.servicios;
-import es.ujaen.dae.sociosclub.entidades.Actividad;
 import es.ujaen.dae.sociosclub.entidades.Solicitudes;
 import es.ujaen.dae.sociosclub.entidades.Usuario;
 import es.ujaen.dae.sociosclub.excepciones.*;
@@ -9,10 +8,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import java.time.LocalDate;
-import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(classes = es.ujaen.dae.sociosclub.app.SociosClub.class)
 @ActiveProfiles("test")

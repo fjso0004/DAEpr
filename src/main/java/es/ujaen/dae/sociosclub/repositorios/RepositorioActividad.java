@@ -15,7 +15,6 @@ public class RepositorioActividad {
 
     public void crear(Actividad actividad) {
         em.persist(actividad);
-        em.flush();
     }
 
     public Optional<Actividad> buscarPorId(int id) {
@@ -32,12 +31,10 @@ public class RepositorioActividad {
 
     public void actualizar(Actividad actividad) {
         em.merge(actividad);
-        em.flush();
     }
 
     public void eliminar(Actividad actividad) {
         em.remove(em.contains(actividad) ? actividad : em.merge(actividad));
-        em.flush();
     }
 }
 

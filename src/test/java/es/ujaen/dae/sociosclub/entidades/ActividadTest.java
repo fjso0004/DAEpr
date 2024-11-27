@@ -1,4 +1,5 @@
 package es.ujaen.dae.sociosclub.entidades;
+import es.ujaen.dae.sociosclub.excepciones.UsuarioYaRegistrado;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -47,14 +48,37 @@ public class ActividadTest {
 
     @Test
     public void testObtenerSolicitudesPendientes() {
-        Solicitudes solicitudPendiente = new Solicitudes();
-        solicitudPendiente.setEstado(Solicitudes.EstadoSolicitud.PENDIENTE);
+        // Configura una actividad con suficientes plazas
+        actividad.setNumPlazas(10);
 
-        Solicitudes solicitudAprobada = new Solicitudes();
-        solicitudAprobada.setEstado(Solicitudes.EstadoSolicitud.ACEPTADA);
+        Usuario usuarioPendiente = new Usuario("12345678B", "Carlos", "Gomez", "Calle Real 123",
+                "600987654", "carlos@ejemplo.com", "clave123", false);
+        Usuario usuarioAprobado = new Usuario("12345678C", "Ana", "Martinez", "Calle Luna 456",
+                "600123987", "ana@ejemplo.com", "clave456", true);
 
-        actividad.altaSolicitud(solicitudPendiente);
-        actividad.altaSolicitud(solicitudAprobada);
-        assertEquals(1, actividad.getSolicitudesPendientes().size());
+        // Crea solicitudes con un número de acompañantes que no exceda las plazas disponibles
+        Solicitudes solicitudPendiente = new Solicitudes(actividad, usuarioPendiente, 1); // 1 acompañante
+        Solicitudes solicitudAprobada = new Solicitudes(actividad, usuarioAprobado, 0); // Sin acompañantes
+
+        // Agrega las solicitudes a la actividad
+        actividad.altaSolicitud(solicitudPendiente); // Se acepta esta solicitud (2 plazas usadas)
+        actividad.altaSolicitud(solicitudAprobada); // Se acepta esta solicitud (1 plaza usada)
+
+        // Verifica que solo la solicitud pendiente esté en la lista de solicitudes pendientes
+        assertEquals(1, actividad.getSolicitudesPendientes().size(),
+                "Debe haber solo una solicitud pendiente.");
+        assertEquals(Solicitudes.EstadoSolicitud.PENDIENTE,
+                actividad.getSolicitudesPendientes().get(0).getEstado(),
+                "La solicitud pendiente debe estar correctamente identificada.");
+    }
+
+    @Test
+    void testAltaSolicitudUsuarioYaRegistrado() {
+        Usuario usuario = new Usuario("12345678A", "Juan", "Pérez", "Calle Falsa 123", "600123456", "juan@ejemplo.com", "password123", true);
+        Solicitudes solicitud1 = new Solicitudes(actividad, usuario, 0);
+        Solicitudes solicitud2 = new Solicitudes(actividad, usuario, 0);
+
+        actividad.altaSolicitud(solicitud1);
+        assertThrows(UsuarioYaRegistrado.class, () -> actividad.altaSolicitud(solicitud2));
     }
 }

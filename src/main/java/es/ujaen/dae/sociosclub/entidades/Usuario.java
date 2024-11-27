@@ -4,7 +4,6 @@ import es.ujaen.dae.sociosclub.util.ExprReg;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.*;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 @Entity
 public class Usuario {
