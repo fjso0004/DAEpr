@@ -110,8 +110,6 @@ public class ServicioProyecto {
         repositorioActividad.actualizar(actividad);
     }
 
-
-
     public void modificarSolicitud(int idActividad, @Positive long idSolicitud, @Positive int numAcomp) {
         Actividad actividad = repositorioActividad.buscarPorId(idActividad)
                 .orElseThrow(ActividadNoRegistrada::new);
@@ -119,8 +117,15 @@ public class ServicioProyecto {
         Solicitudes solicitud = repositorioSolicitudes.buscarPorId(idSolicitud)
                 .orElseThrow(SolicitudNoRegistrada::new);
 
+        int plazasNecesarias = 1 + numAcomp - solicitud.getNumAcomp(); // Cambios en plazas
+        if (actividad.getNumPlazas() < plazasNecesarias) {
+            throw new PlazasNoDisponibles();
+        }
+
         solicitud.setNumAcomp(numAcomp);
+        actividad.setNumPlazas(actividad.getNumPlazas() - plazasNecesarias);
         repositorioSolicitudes.actualizar(solicitud);
+        repositorioActividad.actualizar(actividad);
     }
 
     public void marcarCuota(@NotNull Usuario user) {
@@ -131,35 +136,19 @@ public class ServicioProyecto {
     }
 
     @Transactional
-    public void asignarPlaza(@NotNull Solicitudes solicitud) {
+    public void asignarPlaza(@NotNull Solicitudes solicitud, @Positive int plazasAsignadas) {
         Actividad actividad = solicitud.getActividad();
         if (actividad == null) {
             throw new ActividadNoRegistrada();
         }
 
-        Usuario socio = solicitud.getUsuario();
-        boolean cuotaPagada = socio.getCuota(); // Asegurarse de cargar datos `LAZY`
-
-        if (cuotaPagada && actividad.getNumPlazas() > 0) {
-            solicitud.setEstado(Solicitudes.EstadoSolicitud.ACEPTADA);
-            actividad.borrarSolicitud(solicitud);
-            actividad.setNumPlazas(actividad.getNumPlazas() - 1);
-            repositorioActividad.actualizar(actividad);
-            repositorioSolicitudes.actualizar(solicitud);
-        } else {
-            solicitud.setEstado(Solicitudes.EstadoSolicitud.PENDIENTE);
-            repositorioSolicitudes.actualizar(solicitud);
-        }
-    }
-
-    public void rechazarPlaza(@NotNull Solicitudes solicitud) {
-        solicitud.setEstado(Solicitudes.EstadoSolicitud.RECHAZADA);
-        solicitud.getActividad().borrarSolicitud(solicitud);
+        actividad.asignarPlaza(solicitud, plazasAsignadas);
+        repositorioActividad.actualizar(actividad);
         repositorioSolicitudes.actualizar(solicitud);
-        repositorioActividad.actualizar(solicitud.getActividad());
     }
 
-    public List<Solicitudes> obtenerSolicitudesPendientes(int idActividad) {
+    @Transactional
+    public List<Solicitudes> obtenerSolicitudesPendientes(@Positive int idActividad) {
         Actividad actividad = repositorioActividad.buscarPorId(idActividad)
                 .orElseThrow(ActividadNoRegistrada::new);
         return actividad.getSolicitudesPendientes();

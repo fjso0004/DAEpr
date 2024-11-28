@@ -48,7 +48,6 @@ public class ActividadTest {
 
     @Test
     public void testObtenerSolicitudesPendientes() {
-        // Configura una actividad con suficientes plazas
         actividad.setNumPlazas(10);
 
         Usuario usuarioPendiente = new Usuario("12345678B", "Carlos", "Gomez", "Calle Real 123",
@@ -56,15 +55,12 @@ public class ActividadTest {
         Usuario usuarioAprobado = new Usuario("12345678C", "Ana", "Martinez", "Calle Luna 456",
                 "600123987", "ana@ejemplo.com", "clave456", true);
 
-        // Crea solicitudes con un número de acompañantes que no exceda las plazas disponibles
         Solicitudes solicitudPendiente = new Solicitudes(actividad, usuarioPendiente, 1); // 1 acompañante
         Solicitudes solicitudAprobada = new Solicitudes(actividad, usuarioAprobado, 0); // Sin acompañantes
 
-        // Agrega las solicitudes a la actividad
-        actividad.altaSolicitud(solicitudPendiente); // Se acepta esta solicitud (2 plazas usadas)
-        actividad.altaSolicitud(solicitudAprobada); // Se acepta esta solicitud (1 plaza usada)
+        actividad.altaSolicitud(solicitudPendiente);
+        actividad.altaSolicitud(solicitudAprobada);
 
-        // Verifica que solo la solicitud pendiente esté en la lista de solicitudes pendientes
         assertEquals(1, actividad.getSolicitudesPendientes().size(),
                 "Debe haber solo una solicitud pendiente.");
         assertEquals(Solicitudes.EstadoSolicitud.PENDIENTE,

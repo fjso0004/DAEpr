@@ -50,10 +50,11 @@ public class ServicioProyectoTest {
         var actividadRecargada = servicioProyecto.buscarActividadPorId(actividad.getId());
         var solicitud = actividadRecargada.getSolicitudes().get(0);
 
-        servicioProyecto.asignarPlaza(solicitud);
+        servicioProyecto.asignarPlaza(solicitud, 1);
+        actividadRecargada = servicioProyecto.buscarActividadPorId(actividad.getId());
 
         assertThat(solicitud.getEstado()).isEqualTo(Solicitudes.EstadoSolicitud.ACEPTADA);
-        assertThat(actividadRecargada.getNumPlazas()).isEqualTo(8);
+        assertThat(actividadRecargada.getNumPlazas()).isEqualTo(9);
     }
 
     @Test
@@ -130,6 +131,26 @@ public class ServicioProyectoTest {
         servicioProyecto.crearSolicitud(actividad.getId(), usuario.getDni(), 3);
         assertThatThrownBy(() -> servicioProyecto.crearSolicitud(actividad.getId(), usuario.getDni(), 3))
                 .isInstanceOf(UsuarioYaRegistrado.class);
+    }
+
+    @Test
+    @DirtiesContext
+    void testAdministradorAsignaPlazasExitosamente() {
+        var actividad = servicioProyecto.crearActividad("titulo", "descripcion", 10.0, 10,
+                LocalDate.now().plusDays(2), LocalDate.now(), LocalDate.now().plusDays(5));
+        var usuario = servicioProyecto.crearUsuario(new Usuario("12345678B", "nombre", "apellido",
+                "Calle Falsa 123", "600000000", "email@domain.com", "claveSegura", false));
+
+        servicioProyecto.crearSolicitud(actividad.getId(), usuario.getDni(), 2);
+
+        var actividadRecargada = servicioProyecto.buscarActividadPorId(actividad.getId());
+        var solicitud = actividadRecargada.getSolicitudes().get(0);
+
+        servicioProyecto.asignarPlaza(solicitud, 3); // 1 solicitante + 2 acompañantes
+        actividadRecargada = servicioProyecto.buscarActividadPorId(actividad.getId());
+
+        assertThat(solicitud.getEstado()).isEqualTo(Solicitudes.EstadoSolicitud.ACEPTADA);
+        assertThat(actividadRecargada.getNumPlazas()).isEqualTo(7); // 10 - 3 = 7
     }
 }
 

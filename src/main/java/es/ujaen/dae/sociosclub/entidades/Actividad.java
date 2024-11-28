@@ -86,6 +86,10 @@ public class Actividad {
 
 
     public void altaSolicitud(Solicitudes solicitud) {
+        if (LocalDate.now().isBefore(fechaInicio) || LocalDate.now().isAfter(fechaFin)) {
+            throw new IllegalStateException("No se pueden aceptar solicitudes fuera del periodo de inscripción.");
+        }
+
         boolean solicitudPrevia = this.solicitudes.stream()
                 .anyMatch(s -> s.getUsuario().getDni().equals(solicitud.getUsuario().getDni()));
 
@@ -97,11 +101,12 @@ public class Actividad {
         if (numPlazas >= totalSolicitantes) {
             this.solicitudes.add(solicitud);
             solicitud.setActividad(this);
-            this.numPlazas -= totalSolicitantes;
+            //this.numPlazas -= totalSolicitantes;
         } else {
             throw new PlazasNoDisponibles();
         }
     }
+
 
 
     public void borrarSolicitud(Solicitudes solicitud){
@@ -122,4 +127,17 @@ public class Actividad {
         return id;
     }
 
+    public void asignarPlaza(Solicitudes solicitud, int plazasAsignadas) {
+        int plazasNecesarias = 1 + solicitud.getNumAcomp();
+        if (plazasAsignadas < plazasNecesarias) {
+            throw new IllegalStateException("Las plazas asignadas no cubren al solicitante y sus acompañantes.");
+        }
+
+        if (numPlazas < plazasAsignadas) {
+            throw new PlazasNoDisponibles();
+        }
+
+        solicitud.setEstado(Solicitudes.EstadoSolicitud.ACEPTADA);
+        this.numPlazas -= plazasNecesarias;
+    }
 }

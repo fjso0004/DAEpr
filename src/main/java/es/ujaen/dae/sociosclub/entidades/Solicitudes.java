@@ -32,16 +32,19 @@ public class Solicitudes {
     @JoinColumn(name = "usuario_dni", nullable = false)
     private Usuario usuario;
 
-    public Solicitudes() {
-
-    }
+    public Solicitudes() {}
 
     public Solicitudes(Actividad actividad, Usuario usuario, int num_acomp) {
         this.actividad = actividad;
         this.usuario = usuario;
         this.num_acomp = num_acomp;
-        this.estado = usuario.getCuota() ? EstadoSolicitud.ACEPTADA : EstadoSolicitud.PENDIENTE;
         this.fechaSolicitud = LocalDate.now();
+
+        if (usuario.getCuota() && actividad.getNumPlazas() >= (1 + num_acomp)) {
+            this.estado = EstadoSolicitud.ACEPTADA;
+        } else {
+            this.estado = EstadoSolicitud.PENDIENTE;
+        }
     }
 
     public long getId() {
