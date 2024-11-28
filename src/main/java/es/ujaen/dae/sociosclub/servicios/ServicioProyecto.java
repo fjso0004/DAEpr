@@ -78,6 +78,10 @@ public class ServicioProyecto {
         return actividad;
     }
 
+    public List<Temporada> buscarTodasTemporadas(){
+        return repositorioTemporada.buscarTodas();
+    }
+
 
     public List<Actividad> buscarActividades() {
         return repositorioActividad.buscarTodas().stream()

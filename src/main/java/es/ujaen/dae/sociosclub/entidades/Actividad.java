@@ -75,7 +75,8 @@ public class Actividad {
     public LocalDate getFechaCelebracion(){
         return fechaCelebracion;
     }
-
+    public LocalDate getFechaInicio(){return fechaInicio;}
+    public LocalDate getFechaFin(){return fechaFin;}
     public Temporada getTemporada() {
         return temporada;
     }
