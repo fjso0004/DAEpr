@@ -31,7 +31,7 @@ public class TestControladorSociosClub {
     @Test
     @DirtiesContext
     void testNuevoUsuario() {
-        var usuario = new DUsuario("12345678A", "Pedro", "Gómez", "Calle Real 12", "611203025", "pedro@gmail.com", false, "miClave");
+        var usuario = new DUsuario("12345678A", "Pedro", "Gómez", "Calle Real 12", "611203025", "pedro@gmail.com", false, "miClave12341");
 
         // Crear un nuevo usuario
         var respuesta = restTemplate.postForEntity("/usuarios", usuario, Void.class);

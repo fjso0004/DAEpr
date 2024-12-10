@@ -6,7 +6,8 @@ import org.springframework.cache.annotation.EnableCaching;
 
 @SpringBootApplication(scanBasePackages={
         "es.ujaen.dae.sociosclub.servicios",
-        "es.ujaen.dae.sociosclub.repositorios"
+        "es.ujaen.dae.sociosclub.repositorios",
+        "es.ujaen.dae.sociosclub.rest"
 })
 @EntityScan(basePackages="es.ujaen.dae.sociosclub.entidades")
 @EnableCaching

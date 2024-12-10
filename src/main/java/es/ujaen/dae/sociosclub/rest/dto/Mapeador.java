@@ -17,7 +17,7 @@ public class Mapeador {
 
     public DUsuario dto(Usuario usuario) {
         return new DUsuario(usuario.getDni(), usuario.getNombre(), usuario.getApellidos(),
-                usuario.getDireccion(), usuario.getTlf(), usuario.getEmail(), usuario.getCuota(), "");
+                usuario.getDireccion(), usuario.getTlf(), usuario.getEmail(), usuario.getCuota(), usuario.getClave());
     }
 
     public Usuario entidad(DUsuario dUsuario) {
