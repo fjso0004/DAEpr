@@ -27,12 +27,10 @@ public class ControladorSociosClub {
     @Autowired
     private ServicioProyecto servicioProyecto;
 
-    private Usuario administrador;
+    private static final Usuario administrador = new Usuario("12345678Z", "admin", "-", "-", "659123456",
+            "admin@sociosclub.es", "SuperUser", true);
 
-    @PostConstruct
-    void loginAdministrador() {
-        administrador = servicioProyecto.buscarUsuario(new Usuario("12345678Z", "admin", "-", "-", "-", "-", "-", true), "12345678Z");
-    }
+
 
     // Manejo global de excepciones de validación
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)

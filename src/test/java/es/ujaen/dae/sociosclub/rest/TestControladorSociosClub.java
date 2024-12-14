@@ -78,7 +78,7 @@ public class TestControladorSociosClub {
         var actividadCreada = actividadRespuesta.getBody();
         assertThat(actividadCreada).isNotNull();
 
-        var solicitud = new DSolicitud(0, 1, LocalDate.now(), "PENDIENTE", usuario.dni(), actividadCreada.id());
+        var solicitud = new DSolicitud(1221, 1, LocalDate.now(), "PENDIENTE", usuario.dni(), actividadCreada.id());
 
         // Crear solicitud para la actividad
         var respuesta = restTemplate.postForEntity("/solicitudes?idActividad=" + actividadCreada.id(), solicitud, Void.class);
