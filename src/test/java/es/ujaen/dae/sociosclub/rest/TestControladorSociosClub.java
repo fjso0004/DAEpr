@@ -28,6 +28,31 @@ public class TestControladorSociosClub {
         restTemplate = new TestRestTemplate(restTemplateBuilder);
     }
 
+
+
+    @Test
+    @DirtiesContext
+    public void testNuevaTemporada() {
+        var dTemporada = new DTemporada(2026, 0); // Solo incluye el año
+
+        // Crear una nueva temporada
+        var respuesta = restTemplate.postForEntity("/temporadas", dTemporada, Void.class);
+        assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+        // Intentar crear una temporada con el mismo año
+        respuesta = restTemplate.postForEntity("/temporadas", dTemporada, Void.class);
+        assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+
+        // Validar que la temporada puede ser recuperada
+        var respuestaRecuperacion = restTemplate.getForEntity("/temporadas/{anio}", DTemporada.class, dTemporada.anio());
+        assertThat(respuestaRecuperacion.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(respuestaRecuperacion.getBody()).isNotNull();
+        assertThat(respuestaRecuperacion.getBody().anio()).isEqualTo(dTemporada.anio());
+    }
+
+
+
+
     @Test
     @DirtiesContext
     void testNuevoUsuario() {
@@ -66,7 +91,7 @@ public class TestControladorSociosClub {
     @Test
     @DirtiesContext
     void testNuevaSolicitud() {
-        var usuario = new DUsuario("12345678B", "Ana", "López", "Calle Luna 34", "611301025", "ana@gmail.com", false, "suClave");
+        var usuario = new DUsuario("12345678B", "Ana", "López", "Calle Luna 34", "611301025", "ana@gmail.com", false, "suClave1234");
         var actividad = new DActividad(0, "Pilates", "Clase avanzada", 15.0, 10, LocalDate.now().plusDays(7), LocalDate.now(), LocalDate.now().plusDays(10));
 
         // Crear usuario y actividad
@@ -78,12 +103,14 @@ public class TestControladorSociosClub {
         var actividadCreada = actividadRespuesta.getBody();
         assertThat(actividadCreada).isNotNull();
 
-        var solicitud = new DSolicitud(1221, 1, LocalDate.now(), "PENDIENTE", usuario.dni(), actividadCreada.id());
-
         // Crear solicitud para la actividad
+        var solicitud = new DSolicitud(actividadCreada.id(), 1, LocalDate.now(), "PENDIENTE", usuario.dni(), actividadCreada.id());
+
+        // Enviar la solicitud con el cuerpo correcto
         var respuesta = restTemplate.postForEntity("/solicitudes?idActividad=" + actividadCreada.id(), solicitud, Void.class);
         assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
+
 
     @Test
     @DirtiesContext

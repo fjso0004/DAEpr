@@ -5,6 +5,7 @@ import es.ujaen.dae.sociosclub.entidades.Actividad;
 import es.ujaen.dae.sociosclub.entidades.Solicitudes;
 import es.ujaen.dae.sociosclub.entidades.Temporada;
 import es.ujaen.dae.sociosclub.excepciones.*;
+import es.ujaen.dae.sociosclub.repositorios.RepositorioTemporada;
 import es.ujaen.dae.sociosclub.rest.dto.*;
 import es.ujaen.dae.sociosclub.servicios.ServicioProyecto;
 import jakarta.annotation.PostConstruct;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/sociosclub")
@@ -29,7 +31,8 @@ public class ControladorSociosClub {
 
     private static final Usuario administrador = new Usuario("12345678Z", "admin", "-", "-", "659123456",
             "admin@sociosclub.es", "SuperUser", true);
-
+    @Autowired
+    private RepositorioTemporada repositorioTemporada;
 
 
     // Manejo global de excepciones de validación
@@ -92,7 +95,6 @@ public class ControladorSociosClub {
         }
     }
 
-    // 3. Gestión de solicitudes
     @PostMapping("/solicitudes")
     public ResponseEntity<Void> nuevaSolicitud(@RequestParam int idActividad, @RequestBody DSolicitud dSolicitud) {
         try {
@@ -106,6 +108,7 @@ public class ControladorSociosClub {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
+
 
     @GetMapping("/solicitudes/{id}")
     public ResponseEntity<DSolicitud> obtenerSolicitud(@PathVariable long id) {
@@ -125,21 +128,27 @@ public class ControladorSociosClub {
     // 4. Gestión de temporadas
     @PostMapping("/temporadas")
     public ResponseEntity<Void> nuevaTemporada(@RequestBody DTemporada dTemporada) {
-        Temporada temporada = mapeador.entidad(dTemporada);
+        try {
+            servicioProyecto.crearTemporada(dTemporada.anio());
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (TemporadaYaExistente e) {
 
-        LocalDate fechaInicio = LocalDate.of(dTemporada.anio(), 1, 1);
-        LocalDate fechaFin = LocalDate.of(dTemporada.anio(), 12, 31);
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
 
-        servicioProyecto.crearActividad(
-                "Temporada " + temporada.getAnio(),
-                "Actividades para el año " + temporada.getAnio(),
-                0, // Precio
-                0, // Número de plazas
-                fechaInicio,
-                fechaInicio,
-                fechaFin
-        );
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+
+
+    }
+
+    @GetMapping("/temporadas/{anio}")
+    public ResponseEntity<DTemporada> obtenerTemporada(@PathVariable int anio) {
+        Optional<Temporada> temporadaOpt = repositorioTemporada.buscarPorAnio(anio);
+        if (temporadaOpt.isPresent()) {
+            Temporada temporada = temporadaOpt.get();
+            DTemporada dTemporada = mapeador.dto(temporada);
+            return ResponseEntity.ok(dTemporada);
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
 

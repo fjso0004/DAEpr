@@ -157,4 +157,18 @@ public class ServicioProyecto {
                 .orElseThrow(ActividadNoRegistrada::new);
         return actividad.getSolicitudesPendientes();
     }
+
+    public Temporada crearTemporada(int anio) {
+
+        Optional<Temporada> temporadaOpt = repositorioTemporada.buscarPorAnio(anio);
+        if (temporadaOpt.isPresent()) {
+            throw new TemporadaYaExistente();
+        }
+
+
+        Temporada nuevaTemporada = new Temporada(anio);
+        repositorioTemporada.crear(nuevaTemporada);
+        return nuevaTemporada;
+    }
+
 }
