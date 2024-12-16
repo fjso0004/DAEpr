@@ -75,6 +75,7 @@ public String getEmail() {
 public String getClave() {
     return clave;
 }
+public void setClave(String clave){clave = CodificadorMd5.codificar(clave);};
 
 public Boolean getCuota() {
     return cuotaPagada;

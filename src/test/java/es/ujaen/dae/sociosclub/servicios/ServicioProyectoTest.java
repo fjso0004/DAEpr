@@ -8,8 +8,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import java.time.LocalDate;
+import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(classes = es.ujaen.dae.sociosclub.app.SociosClub.class)
 @ActiveProfiles("test")
@@ -22,8 +24,14 @@ public class ServicioProyectoTest {
     @DirtiesContext
     void testCrearUsuarioExitoso() {
         var usuario = new Usuario("12345678B", "nombre", "apellido", "Calle Falsa 123", "600000000", "email@domain.com", "claveSegura", false);
+
+        servicioProyecto.encodePassword("claveSegura");
+
         var result = servicioProyecto.crearUsuario(usuario);
-        assertThat(result).isEqualTo(usuario);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getDni()).isEqualTo("12345678B");
+        assertThat(result.getClave()).isNotEqualTo("claveSegura");
     }
 
     @Test
@@ -151,6 +159,17 @@ public class ServicioProyectoTest {
 
         assertThat(solicitud.getEstado()).isEqualTo(Solicitudes.EstadoSolicitud.ACEPTADA);
         assertThat(actividadRecargada.getNumPlazas()).isEqualTo(7); // 10 - 3 = 7
+    }
+
+    @Test
+    void buscarUsuarioPorDni_Exito() {
+        var usuarioEsperado = new Usuario("12345678A", "Juan", "Perez", "Calle Falsa", "600123456", "juan@ejemplo.com", "clave123", false);
+
+        Optional<Usuario> resultado = servicioProyecto.buscarUsuarioPorDni("12345678A");
+
+        assertThat(resultado).isPresent();
+        assertThat(resultado.get()).isEqualTo(usuarioEsperado);
+        assertEquals("Juan", resultado.get().getNombre());
     }
 }
 

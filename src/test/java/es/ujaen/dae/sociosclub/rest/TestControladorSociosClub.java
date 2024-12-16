@@ -24,11 +24,9 @@ public class TestControladorSociosClub {
     @PostConstruct
     void crearRestTemplate() {
         var restTemplateBuilder = new RestTemplateBuilder()
-                .rootUri("http://localhost:" + localPort + "/sociosclub");
+                .rootUri("http://localhost:" + localPort + "/sociosclub").basicAuthentication("12345678Z", "SuperUser");
         restTemplate = new TestRestTemplate(restTemplateBuilder);
     }
-
-
 
     @Test
     @DirtiesContext
@@ -49,9 +47,6 @@ public class TestControladorSociosClub {
         assertThat(respuestaRecuperacion.getBody()).isNotNull();
         assertThat(respuestaRecuperacion.getBody().anio()).isEqualTo(dTemporada.anio());
     }
-
-
-
 
     @Test
     @DirtiesContext
@@ -111,7 +106,6 @@ public class TestControladorSociosClub {
         assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
 
-
     @Test
     @DirtiesContext
     void testListarTemporadas() {
@@ -126,6 +120,67 @@ public class TestControladorSociosClub {
         var respuesta = restTemplate.getForEntity("/temporadas", DTemporada[].class);
         assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(respuesta.getBody()).isNotNull().hasSize(2);
+    }
+
+    @Test
+    @DirtiesContext
+    void testObtenerActividad() {
+        var actividad = new DActividad(0, "Zumba", "Clase energética", 12.0, 15, LocalDate.now().plusDays(3), LocalDate.now(), LocalDate.now().plusDays(7));
+
+        // Crear actividad
+        var actividadRespuesta = restTemplate.postForEntity("/actividades", actividad, DActividad.class);
+        assertThat(actividadRespuesta.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+        // Obtener actividad por ID
+        var actividadCreada = actividadRespuesta.getBody();
+        var respuesta = restTemplate.getForEntity("/actividades/{id}", DActividad.class, actividadCreada.id());
+
+        assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(respuesta.getBody()).isNotNull();
+        assertThat(respuesta.getBody().tituloCorto()).isEqualTo("Zumba");
+    }
+
+    @Test
+    @DirtiesContext
+    void testModificarSolicitud() {
+        var solicitud = new DSolicitud(0, 2, LocalDate.now(), "PENDIENTE", "12345678B", 1);
+        long idSolicitud = 1;
+
+        restTemplate.put("/solicitudes/{idSolicitud}", solicitud, idSolicitud);
+
+        var respuesta = restTemplate.getForEntity("/solicitudes/{idSolicitud}", DSolicitud.class, idSolicitud);
+        assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(respuesta.getBody()).isNotNull();
+    }
+
+    @Test
+    @DirtiesContext
+    void testBorrarSolicitud() {
+        // Crear actividad y solicitud previo al borrado
+        var actividad = new DActividad(0,
+                "Título de prueba", "Descripción de prueba", 20.0, 10,
+                LocalDate.now().plusDays(10), LocalDate.now(), LocalDate.now().plusMonths(1)
+        );
+
+        // Eliminar la solicitud
+        //long idSolicitud = actividad.; // Obtener ID dinámico
+        //restTemplate.delete("/solicitudes/{idSolicitud}", idSolicitud);
+
+        // Validar que ya no existe
+        //var respuesta = restTemplate.getForEntity("/solicitudes/{idSolicitud}", DSolicitud.class, idSolicitud);
+        //assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    @DirtiesContext
+    void testMarcarPagoCuota() {
+        String dni = "12345678B";
+        restTemplate.put("/socios/{dni}/pago", null, dni);
+
+        var respuesta = restTemplate.getForEntity("/usuarios/{dni}", DUsuario.class, dni);
+        assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(respuesta.getBody()).isNotNull();
+        assertThat(respuesta.getBody().cuotaPagada()).isTrue();
     }
 }
 

@@ -7,6 +7,7 @@ import es.ujaen.dae.sociosclub.entidades.Temporada;
 import es.ujaen.dae.sociosclub.excepciones.*;
 import es.ujaen.dae.sociosclub.repositorios.RepositorioTemporada;
 import es.ujaen.dae.sociosclub.rest.dto.*;
+import es.ujaen.dae.sociosclub.seguridad.ServicioCredencialesUsuario;
 import es.ujaen.dae.sociosclub.servicios.ServicioProyecto;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.ConstraintViolationException;
@@ -15,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,10 +29,17 @@ public class ControladorSociosClub {
     @Autowired
     private ServicioProyecto servicioProyecto;
 
+    @Autowired
+    private static ServicioCredencialesUsuario servicioCredencialesUsuario = new ServicioCredencialesUsuario();
+
     private static final Usuario administrador = new Usuario("12345678Z", "admin", "-", "-", "659123456",
             "admin@sociosclub.es", "SuperUser", true);
     @Autowired
     private RepositorioTemporada repositorioTemporada;
+
+    public void admin (Usuario administrador) {
+        servicioCredencialesUsuario.loadUserByUsername(administrador.getDni());
+    }
 
 
     // Manejo global de excepciones de validación
@@ -113,12 +120,7 @@ public class ControladorSociosClub {
     @GetMapping("/solicitudes/{id}")
     public ResponseEntity<DSolicitud> obtenerSolicitud(@PathVariable long id) {
         try {
-            Solicitudes solicitud = servicioProyecto.buscarActividadPorId((int) id)
-                    .getSolicitudes()
-                    .stream()
-                    .filter(s -> s.getId() == id)
-                    .findFirst()
-                    .orElseThrow(SolicitudNoRegistrada::new);
+            Solicitudes solicitud = servicioProyecto.buscarSolicitudPorId(id);
             return ResponseEntity.ok(mapeador.dto(solicitud));
         } catch (SolicitudNoRegistrada e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -135,9 +137,6 @@ public class ControladorSociosClub {
 
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-
-
-
     }
 
     @GetMapping("/temporadas/{anio}")

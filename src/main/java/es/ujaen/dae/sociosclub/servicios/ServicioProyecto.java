@@ -8,11 +8,14 @@ import es.ujaen.dae.sociosclub.repositorios.RepositorioActividad;
 import es.ujaen.dae.sociosclub.repositorios.RepositorioSolicitudes;
 import es.ujaen.dae.sociosclub.repositorios.RepositorioTemporada;
 import es.ujaen.dae.sociosclub.repositorios.RepositorioUsuario;
+import es.ujaen.dae.sociosclub.seguridad.ServicioCredencialesUsuario;
+import es.ujaen.dae.sociosclub.seguridad.ServicioSeguridad;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import java.time.LocalDate;
 import java.util.*;
@@ -21,6 +24,8 @@ import java.util.*;
 @Validated
 public class ServicioProyecto {
     @Autowired
+    private static ServicioSeguridad servicioSeguridad = new ServicioSeguridad();
+    @Autowired
     RepositorioUsuario repositorioUsuario;
     @Autowired
     RepositorioActividad repositorioActividad;
@@ -28,19 +33,27 @@ public class ServicioProyecto {
     RepositorioSolicitudes repositorioSolicitudes;
     @Autowired
     RepositorioTemporada repositorioTemporada;
-
+    @Autowired
+    private static PasswordEncoder passwordEncoder = servicioSeguridad.passwordEncoder();
+            //new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
 
     private static final Usuario administrador = new Usuario("12345678Z", "admin", "-", "-", "659123456",
              "admin@sociosclub.es", "SuperUser", true);
 
     public ServicioProyecto() {}
 
+    public String encodePassword(String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
+    }
+
     public Usuario crearUsuario(@NotNull @Valid Usuario usuario) {
-        if (usuario.getDni().equals(administrador.getDni())){
-            throw new UsuarioYaRegistrado();
-        }
+        usuario.setClave(passwordEncoder.encode(usuario.getClave())); // Codificar clave
         repositorioUsuario.crear(usuario);
         return usuario;
+    }
+
+    public Optional<Usuario> buscarUsuarioPorDni(@NotBlank String dni) {
+        return repositorioUsuario.buscarPorDni(dni);
     }
 
     public boolean login(@NotBlank String dni, @NotBlank String clave) {
@@ -171,4 +184,10 @@ public class ServicioProyecto {
         return nuevaTemporada;
     }
 
+
+    @Transactional
+    public Solicitudes buscarSolicitudPorId(long idSolicitud) {
+        return repositorioSolicitudes.buscarPorId(idSolicitud)
+                .orElseThrow(SolicitudNoRegistrada::new);
+    }
 }
