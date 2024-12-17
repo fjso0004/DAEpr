@@ -5,6 +5,7 @@ import es.ujaen.dae.sociosclub.excepciones.UsuarioNoRegistrado;
 import es.ujaen.dae.sociosclub.repositorios.RepositorioActividad;
 import es.ujaen.dae.sociosclub.repositorios.RepositorioUsuario;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,6 +15,9 @@ public class Mapeador {
     private RepositorioUsuario repositorioUsuario;
     @Autowired
     private RepositorioActividad repositorioActividad;
+    //@Autowired
+    //PasswordEncoder codificadorClaves;
+
 
     public DUsuario dto(Usuario usuario) {
         return new DUsuario(usuario.getDni(), usuario.getNombre(), usuario.getApellidos(),

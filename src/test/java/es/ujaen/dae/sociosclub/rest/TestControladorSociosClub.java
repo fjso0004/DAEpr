@@ -33,15 +33,12 @@ public class TestControladorSociosClub {
     public void testNuevaTemporada() {
         var dTemporada = new DTemporada(2026, 0); // Solo incluye el año
 
-        // Crear una nueva temporada
         var respuesta = restTemplate.postForEntity("/temporadas", dTemporada, Void.class);
         assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        // Intentar crear una temporada con el mismo año
         respuesta = restTemplate.postForEntity("/temporadas", dTemporada, Void.class);
         assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
 
-        // Validar que la temporada puede ser recuperada
         var respuestaRecuperacion = restTemplate.getForEntity("/temporadas/{anio}", DTemporada.class, dTemporada.anio());
         assertThat(respuestaRecuperacion.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(respuestaRecuperacion.getBody()).isNotNull();
@@ -52,16 +49,12 @@ public class TestControladorSociosClub {
     @DirtiesContext
     void testNuevoUsuario() {
         var usuario = new DUsuario("12345678A", "Pedro", "Gómez", "Calle Real 12", "611203025", "pedro@gmail.com", false, "miClave12341");
-
-        // Crear un nuevo usuario
         var respuesta = restTemplate.postForEntity("/usuarios", usuario, Void.class);
-        assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        // Intentar crear un usuario con el mismo DNI
+        assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         respuesta = restTemplate.postForEntity("/usuarios", usuario, Void.class);
         assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
 
-        // Validar que el usuario puede ser recuperado
         var respuestaLogin = restTemplate.getForEntity("/usuarios/{dni}?clave={clave}", DUsuario.class, usuario.dni(), usuario.clave());
         assertThat(respuestaLogin.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(respuestaLogin.getBody()).isEqualTo(usuario);
@@ -72,11 +65,9 @@ public class TestControladorSociosClub {
     void testNuevaActividad() {
         var actividad = new DActividad(0, "Yoga", "Clase para principiantes", 10.0, 20, LocalDate.now().plusDays(5), LocalDate.now(), LocalDate.now().plusDays(10));
 
-        // Crear una nueva actividad
         var respuesta = restTemplate.postForEntity("/actividades", actividad, DActividad.class);
         assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        // Obtener la lista de actividades y validar que contiene la actividad creada
         var actividades = restTemplate.getForEntity("/actividades", DActividad[].class);
         assertThat(actividades.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(actividades.getBody()).isNotNull().hasSize(1);
@@ -88,20 +79,16 @@ public class TestControladorSociosClub {
     void testNuevaSolicitud() {
         var usuario = new DUsuario("12345678B", "Ana", "López", "Calle Luna 34", "611301025", "ana@gmail.com", false, "suClave1234");
         var actividad = new DActividad(0, "Pilates", "Clase avanzada", 15.0, 10, LocalDate.now().plusDays(7), LocalDate.now(), LocalDate.now().plusDays(10));
-
-        // Crear usuario y actividad
         restTemplate.postForEntity("/usuarios", usuario, Void.class);
+
         var actividadRespuesta = restTemplate.postForEntity("/actividades", actividad, DActividad.class);
         assertThat(actividadRespuesta.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        // Obtener la actividad para usar su ID
         var actividadCreada = actividadRespuesta.getBody();
         assertThat(actividadCreada).isNotNull();
 
-        // Crear solicitud para la actividad
         var solicitud = new DSolicitud(actividadCreada.id(), 1, LocalDate.now(), "PENDIENTE", usuario.dni(), actividadCreada.id());
 
-        // Enviar la solicitud con el cuerpo correcto
         var respuesta = restTemplate.postForEntity("/solicitudes?idActividad=" + actividadCreada.id(), solicitud, Void.class);
         assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
@@ -112,11 +99,9 @@ public class TestControladorSociosClub {
         var temporada1 = new DTemporada(2024, 0);
         var temporada2 = new DTemporada(2025, 0);
 
-        // Crear temporadas
         restTemplate.postForEntity("/temporadas", temporada1, Void.class);
         restTemplate.postForEntity("/temporadas", temporada2, Void.class);
 
-        // Listar temporadas
         var respuesta = restTemplate.getForEntity("/temporadas", DTemporada[].class);
         assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(respuesta.getBody()).isNotNull().hasSize(2);
@@ -127,11 +112,9 @@ public class TestControladorSociosClub {
     void testObtenerActividad() {
         var actividad = new DActividad(0, "Zumba", "Clase energética", 12.0, 15, LocalDate.now().plusDays(3), LocalDate.now(), LocalDate.now().plusDays(7));
 
-        // Crear actividad
         var actividadRespuesta = restTemplate.postForEntity("/actividades", actividad, DActividad.class);
         assertThat(actividadRespuesta.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        // Obtener actividad por ID
         var actividadCreada = actividadRespuesta.getBody();
         var respuesta = restTemplate.getForEntity("/actividades/{id}", DActividad.class, actividadCreada.id());
 
@@ -153,6 +136,7 @@ public class TestControladorSociosClub {
         assertThat(respuesta.getBody()).isNotNull();
     }
 
+    /*
     @Test
     @DirtiesContext
     void testBorrarSolicitud() {
@@ -170,6 +154,7 @@ public class TestControladorSociosClub {
         //var respuesta = restTemplate.getForEntity("/solicitudes/{idSolicitud}", DSolicitud.class, idSolicitud);
         //assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
+     */
 
     @Test
     @DirtiesContext

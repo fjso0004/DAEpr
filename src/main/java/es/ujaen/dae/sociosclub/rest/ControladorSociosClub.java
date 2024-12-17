@@ -11,6 +11,7 @@ import es.ujaen.dae.sociosclub.seguridad.ServicioCredencialesUsuario;
 import es.ujaen.dae.sociosclub.servicios.ServicioProyecto;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,13 +28,22 @@ public class ControladorSociosClub {
     private Mapeador mapeador;
 
     @Autowired
-    private ServicioProyecto servicioProyecto;
+    private static ServicioProyecto servicioProyecto;
 
     @Autowired
     private static ServicioCredencialesUsuario servicioCredencialesUsuario = new ServicioCredencialesUsuario();
 
-    private static final Usuario administrador = new Usuario("12345678Z", "admin", "-", "-", "659123456",
-            "admin@sociosclub.es", "SuperUser", true);
+    private static final Usuario administrador = new Usuario(
+            "12345678Z",
+            "admin",
+            "-",
+            "-",
+            "659123456",
+            "admin@sociosclub.es",
+            new BCryptPasswordEncoder().encode("SuperUser"), // Contraseña codificada
+            true
+    );
+
     @Autowired
     private RepositorioTemporada repositorioTemporada;
 

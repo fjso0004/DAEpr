@@ -14,6 +14,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
@@ -34,20 +35,24 @@ public class ServicioProyecto {
     @Autowired
     RepositorioTemporada repositorioTemporada;
     @Autowired
-    private static PasswordEncoder passwordEncoder = servicioSeguridad.passwordEncoder();
-            //new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
+    private PasswordEncoder passwordEncoder;
 
-    private static final Usuario administrador = new Usuario("12345678Z", "admin", "-", "-", "659123456",
-             "admin@sociosclub.es", "SuperUser", true);
+    private static final Usuario administrador = new Usuario(
+            "12345678Z",
+            "admin",
+            "-",
+            "-",
+            "659123456",
+            "admin@sociosclub.es",
+            new BCryptPasswordEncoder().encode("SuperUser"), // Contraseña codificada
+            true
+    );
 
     public ServicioProyecto() {}
 
-    public String encodePassword(String rawPassword) {
-        return passwordEncoder.encode(rawPassword);
-    }
-
     public Usuario crearUsuario(@NotNull @Valid Usuario usuario) {
-        usuario.setClave(passwordEncoder.encode(usuario.getClave())); // Codificar clave
+        String claveCodificada = passwordEncoder.encode(usuario.getClave()); // Codificar clave
+        usuario.setClave(claveCodificada);
         repositorioUsuario.crear(usuario);
         return usuario;
     }
