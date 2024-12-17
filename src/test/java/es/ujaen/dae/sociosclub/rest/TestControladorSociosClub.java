@@ -1,7 +1,10 @@
 package es.ujaen.dae.sociosclub.rest;
+import es.ujaen.dae.sociosclub.entidades.Usuario;
 import es.ujaen.dae.sociosclub.rest.dto.*;
+import es.ujaen.dae.sociosclub.servicios.ServicioProyecto;
 import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -24,7 +27,7 @@ public class TestControladorSociosClub {
     @PostConstruct
     void crearRestTemplate() {
         var restTemplateBuilder = new RestTemplateBuilder()
-                .rootUri("http://localhost:" + localPort + "/sociosclub").basicAuthentication("12345678Z", "SuperUser");
+                .rootUri("http://localhost:" + localPort + "/sociosclub");
         restTemplate = new TestRestTemplate(restTemplateBuilder);
     }
 

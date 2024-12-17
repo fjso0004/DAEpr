@@ -6,10 +6,10 @@ import es.ujaen.dae.sociosclub.entidades.Solicitudes;
 import es.ujaen.dae.sociosclub.entidades.Temporada;
 import es.ujaen.dae.sociosclub.excepciones.*;
 import es.ujaen.dae.sociosclub.repositorios.RepositorioTemporada;
+import es.ujaen.dae.sociosclub.repositorios.RepositorioUsuario;
 import es.ujaen.dae.sociosclub.rest.dto.*;
 import es.ujaen.dae.sociosclub.seguridad.ServicioCredencialesUsuario;
 import es.ujaen.dae.sociosclub.servicios.ServicioProyecto;
-import jakarta.annotation.PostConstruct;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,10 +28,10 @@ public class ControladorSociosClub {
     private Mapeador mapeador;
 
     @Autowired
-    private static ServicioProyecto servicioProyecto;
+    private ServicioProyecto servicioProyecto;
 
     @Autowired
-    private static ServicioCredencialesUsuario servicioCredencialesUsuario = new ServicioCredencialesUsuario();
+    private ServicioCredencialesUsuario servicioCredencialesUsuario = new ServicioCredencialesUsuario();
 
     private static final Usuario administrador = new Usuario(
             "12345678Z",
@@ -47,10 +47,13 @@ public class ControladorSociosClub {
     @Autowired
     private RepositorioTemporada repositorioTemporada;
 
-    public void admin (Usuario administrador) {
-        servicioCredencialesUsuario.loadUserByUsername(administrador.getDni());
-    }
+    @Autowired
+    private RepositorioUsuario repositorioUsuario;
 
+    public void admin () {
+        servicioCredencialesUsuario.loadUserByUsername(administrador.getDni());
+        repositorioUsuario.crear(administrador);
+    }
 
     // Manejo global de excepciones de validación
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
