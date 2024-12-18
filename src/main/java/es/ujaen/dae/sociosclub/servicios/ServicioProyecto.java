@@ -106,7 +106,7 @@ public class ServicioProyecto {
                 .filter(this::actividadValida)
                 .toList();
     }
-    
+
 
     private boolean actividadValida(Actividad actividad) {
         return actividad.getFechaCelebracion().isAfter(LocalDate.now());
@@ -184,17 +184,14 @@ public class ServicioProyecto {
 
     @Transactional
     public void borrarSolicitud(long idSolicitud) {
-     
         Solicitudes solicitud = repositorioSolicitudes.buscarPorId(idSolicitud)
-                .orElseThrow(SolicitudNoRegistrada::new); 
+                .orElseThrow(SolicitudNoRegistrada::new);
 
-       
-        repositorioSolicitudes.eliminar(solicitud);  
+        repositorioSolicitudes.eliminar(solicitud);
 
-      
         Actividad actividad = solicitud.getActividad();
-        actividad.borrarSolicitud(solicitud);  
-        repositorioActividad.actualizar(actividad);  
+        actividad.borrarSolicitud(solicitud);
+        repositorioActividad.actualizar(actividad);
     }
 
 
@@ -219,7 +216,17 @@ public class ServicioProyecto {
     public List<Actividad> buscarActividadesPorTemporada(int anio) {
         Temporada temporada = repositorioTemporada.buscarPorAnio(anio)
                 .orElseThrow(() -> new RuntimeException("Temporada no encontrada"));
+        List<Actividad> actividades = temporada.getActividades();
+        System.out.println("Actividades: " + actividades.size()); // Debe mostrar 2 en caso esperado
         return temporada.getActividades();
+    }
+
+    @Transactional
+    public List<Solicitudes> listarSolicitudesDeActividad(int idActividad) {
+        Actividad actividad = repositorioActividad.buscarPorId(idActividad)
+                .orElseThrow(ActividadNoRegistrada::new);
+
+        return repositorioSolicitudes.listarSolicitudesPorActividad(idActividad);
     }
 }
 

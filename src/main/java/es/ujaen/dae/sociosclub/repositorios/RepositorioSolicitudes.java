@@ -31,6 +31,12 @@ public class RepositorioSolicitudes {
                 .getResultList();
     }
 
+    public List<Solicitudes> listarSolicitudesPorActividad(int idActividad) {
+        return em.createQuery("SELECT s FROM Solicitudes s WHERE s.actividad.id = :idActividad", Solicitudes.class)
+                .setParameter("idActividad", idActividad)
+                .getResultList();
+    }
+
     public void actualizar(Solicitudes solicitud) {
         em.merge(solicitud);
     }

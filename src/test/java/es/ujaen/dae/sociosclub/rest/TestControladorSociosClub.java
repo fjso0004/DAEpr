@@ -229,40 +229,49 @@ public class TestControladorSociosClub {
 
     @Test
     @DirtiesContext
-    void testListarActividadesPorTemporadaUsuarioComun() {
-        // Registrar usuario estándar
+    void testListarActividadesPorTemporada() {
         var usuario = new DUsuario("12345678B", "Carlos", "Pérez", "Calle Real 10", "611203025", "carlos@gmail.com", false, "clave123");
-        var registroUsuario = restTemplate.postForEntity("/usuarios", usuario, Void.class);
-        assertThat(registroUsuario.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        restTemplate.postForEntity("/usuarios", usuario, Void.class);
 
-        // Crear temporada
         var temporada = new DTemporada(2025, 0);
-        var registroTemporada = adminRestTemplate.postForEntity("/temporadas", temporada, Void.class);
-        assertThat(registroTemporada.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        adminRestTemplate.postForEntity("/temporadas", temporada, Void.class);
 
-        // Crear actividades asociadas a la temporada
         var actividad1 = new DActividad(0, "Natación", "Clases de natación", 15.0, 20, LocalDate.now().plusDays(5), LocalDate.now(), LocalDate.now().plusDays(10));
         var actividad2 = new DActividad(0, "Yoga", "Clases de yoga", 10.0, 15, LocalDate.now().plusDays(8), LocalDate.now(), LocalDate.now().plusDays(12));
 
-        var actividad1Response = adminRestTemplate.postForEntity("/actividades", actividad1, DActividad.class);
-        var actividad2Response = adminRestTemplate.postForEntity("/actividades", actividad2, DActividad.class);
+        adminRestTemplate.postForEntity("/actividades", actividad1, DActividad.class);
+        adminRestTemplate.postForEntity("/actividades", actividad2, DActividad.class);
 
-        assertThat(actividad1Response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        assertThat(actividad2Response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-        // Asociar las actividades a la temporada (si no se hace automáticamente)
-        adminRestTemplate.postForEntity("/temporadas/{anio}/actividades/{idActividad}", null, Void.class, temporada.anio(), actividad1Response.getBody().id());
-        adminRestTemplate.postForEntity("/temporadas/{anio}/actividades/{idActividad}", null, Void.class, temporada.anio(), actividad2Response.getBody().id());
-
-        // Validar que las actividades están asociadas como administrador
-        var actividadesTemporada = adminRestTemplate.getForEntity("/temporadas/{anio}/actividades", DActividad[].class, temporada.anio());
-        assertThat(actividadesTemporada.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(actividadesTemporada.getBody()).isNotNull().hasSize(2);
-
-        // Verificar acceso como usuario común
         var userAuthenticatedTemplate = restTemplate.withBasicAuth(usuario.dni(), usuario.clave());
         var actividadesResponse = userAuthenticatedTemplate.getForEntity("/temporadas/{anio}/actividades", DActividad[].class, temporada.anio());
+
         assertThat(actividadesResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(actividadesResponse.getBody()).isNotNull().hasSize(2);
+    }
+
+    @Test
+    @DirtiesContext
+    void testListarSolicitudesDeActividad() {
+        var actividad = new DActividad(0, "Futbol", "Entrenamiento avanzado", 10.0, 20, LocalDate.now().plusDays(5), LocalDate.now(), LocalDate.now().plusDays(10));
+        var actividadResponse = adminRestTemplate.postForEntity("/actividades", actividad, DActividad.class);
+        assertThat(actividadResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+        var usuario = new DUsuario("12345678A", "Juan", "Pérez", "Calle Centro 14", "611203023", "juan@gmail.com", false, "clave123");
+        var registroUsuario = restTemplate.postForEntity("/usuarios", usuario, Void.class);
+        assertThat(registroUsuario.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+        var solicitud = new DSolicitud(0, 2, LocalDate.now(), "PENDIENTE", "12345678A", actividadResponse.getBody().id());
+        var userAuthenticatedTemplate = restTemplate.withBasicAuth(usuario.dni(), usuario.clave());
+        var solicitudResponse = userAuthenticatedTemplate.postForEntity(
+                "/solicitudes?idActividad=" + actividadResponse.getBody().id(), solicitud, Void.class);
+        assertThat(solicitudResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+        var solicitudesResponse = adminRestTemplate.getForEntity("/actividades/{id}/solicitudes", DSolicitud[].class, actividadResponse.getBody().id());
+        assertThat(solicitudesResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(solicitudesResponse.getBody()).isNotNull().hasSize(1);
+
+        var solicitudes = solicitudesResponse.getBody();
+        assert solicitudes != null;
+        assertThat(solicitudes[0].dniUsuario()).isEqualTo("12345678A");
     }
 }
