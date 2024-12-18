@@ -8,7 +8,6 @@ import es.ujaen.dae.sociosclub.repositorios.RepositorioActividad;
 import es.ujaen.dae.sociosclub.repositorios.RepositorioSolicitudes;
 import es.ujaen.dae.sociosclub.repositorios.RepositorioTemporada;
 import es.ujaen.dae.sociosclub.repositorios.RepositorioUsuario;
-import es.ujaen.dae.sociosclub.seguridad.ServicioCredencialesUsuario;
 import es.ujaen.dae.sociosclub.seguridad.ServicioSeguridad;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -25,7 +24,7 @@ import java.util.*;
 @Validated
 public class ServicioProyecto {
     @Autowired
-    private static ServicioSeguridad servicioSeguridad = new ServicioSeguridad();
+    private ServicioSeguridad servicioSeguridad = new ServicioSeguridad();
     @Autowired
     RepositorioUsuario repositorioUsuario;
     @Autowired
@@ -214,6 +213,13 @@ public class ServicioProyecto {
             usuario.setCuota(true);
             repositorioUsuario.actualizar(usuario);
         }
+    }
+
+    @Transactional
+    public List<Actividad> buscarActividadesPorTemporada(int anio) {
+        Temporada temporada = repositorioTemporada.buscarPorAnio(anio)
+                .orElseThrow(() -> new RuntimeException("Temporada no encontrada"));
+        return temporada.getActividades();
     }
 }
 

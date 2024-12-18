@@ -170,5 +170,42 @@ public class ControladorSociosClub {
         List<DTemporada> temporadasDTO = temporadas.stream().map(mapeador::dto).toList();
         return ResponseEntity.ok(temporadasDTO);
     }
+
+    @DeleteMapping("/solicitudes/{id}")
+    public ResponseEntity<DSolicitud> borrarSolicitud(@PathVariable long id) {
+        servicioProyecto.borrarSolicitud(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/usuarios/{dni}/pagoCuota")
+    public ResponseEntity<Void> marcarCuotaPagada(@PathVariable String dni) {
+        servicioProyecto.marcarCuotaPagada(dni);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/solicitudes/{idSolicitud}")
+    public ResponseEntity<Void> modificarSolicitud(
+            @PathVariable long idSolicitud,
+            @RequestParam int idActividad,
+            @RequestParam int numAcomp) {
+        try {
+            servicioProyecto.modificarSolicitud(idActividad, idSolicitud, numAcomp);
+            return ResponseEntity.ok().build();
+        } catch (ActividadNoRegistrada | SolicitudNoRegistrada | PlazasNoDisponibles e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    @GetMapping("/temporadas/{anio}/actividades")
+    public ResponseEntity<List<DActividad>> listarActividadesPorTemporada(@PathVariable int anio) {
+        try {
+            List<Actividad> actividades = servicioProyecto.buscarActividadesPorTemporada(anio);
+            List<DActividad> actividadesDTO = actividades.stream().map(mapeador::dto).toList();
+            return ResponseEntity.ok(actividadesDTO);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
 }
 
