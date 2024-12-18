@@ -62,7 +62,6 @@ public class TestControladorSociosClub {
 
         var respuestaLogin = restTemplate.withBasicAuth(usuario.dni(), usuario.clave()).getForEntity(
                 "/usuarios/{dni}", DUsuario.class, usuario.dni());
-
           //      getForEntity("/usuarios/{dni}?clave={clave}", DUsuario.class, usuario.dni(), usuario.clave());
         assertThat(respuestaLogin.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(respuestaLogin.getBody().dni()).isEqualTo(usuario.dni());
