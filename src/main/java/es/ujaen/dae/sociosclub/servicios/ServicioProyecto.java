@@ -190,6 +190,21 @@ public class ServicioProyecto {
         return nuevaTemporada;
     }
 
+    @Transactional
+    public void borrarSolicitud(long idSolicitud) {
+     
+        Solicitudes solicitud = repositorioSolicitudes.buscarPorId(idSolicitud)
+                .orElseThrow(SolicitudNoRegistrada::new); 
+
+       
+        repositorioSolicitudes.eliminar(solicitud);  
+
+      
+        Actividad actividad = solicitud.getActividad();
+        actividad.borrarSolicitud(solicitud);  
+        repositorioActividad.actualizar(actividad);  
+    }
+
 
     @Transactional
     public Solicitudes buscarSolicitudPorId(long idSolicitud) {
@@ -197,3 +212,4 @@ public class ServicioProyecto {
                 .orElseThrow(SolicitudNoRegistrada::new);
     }
 }
+

@@ -50,10 +50,7 @@ public class ControladorSociosClub {
     @Autowired
     private RepositorioUsuario repositorioUsuario;
 
-    public void admin () {
-        servicioCredencialesUsuario.loadUserByUsername(administrador.getDni());
-        repositorioUsuario.crear(administrador);
-    }
+
 
     // Manejo global de excepciones de validación
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
@@ -140,6 +137,18 @@ public class ControladorSociosClub {
         }
     }
 
+    @DeleteMapping("/solicitudes/{id}")
+    public ResponseEntity<Void> borrarSolicitud(@PathVariable long id) {
+        try {
+
+            servicioProyecto.borrarSolicitud(id);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (SolicitudNoRegistrada e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+
     // 4. Gestión de temporadas
     @PostMapping("/temporadas")
     public ResponseEntity<Void> nuevaTemporada(@RequestBody DTemporada dTemporada) {
@@ -170,5 +179,10 @@ public class ControladorSociosClub {
         List<DTemporada> temporadasDTO = temporadas.stream().map(mapeador::dto).toList();
         return ResponseEntity.ok(temporadasDTO);
     }
+
+
+
+
+
 }
 

@@ -23,6 +23,7 @@ public class TestControladorSociosClub {
     TestRestTemplate adminRestTemplate;
 
 
+
     @PostConstruct
     void crearRestTemplate() {
         var restTemplateBuilder = new RestTemplateBuilder()
@@ -38,6 +39,8 @@ public class TestControladorSociosClub {
                 !respuestaAdmin.getStatusCode().equals(HttpStatus.CONFLICT)) {
             throw new RuntimeException("No se pudo configurar el administrador predeterminado");
         }
+
+
 
         // Crear un restTemplate con autenticación de administrador
         adminRestTemplate = restTemplate.withBasicAuth(admin.dni(), admin.clave());
@@ -166,18 +169,19 @@ public class TestControladorSociosClub {
         assertThat(respuesta.getBody()).isNotNull();
     }
 
-/*
+    /*
     @Test
     @DirtiesContext
-    void testMarcarPagoCuota() {
-        // Paso 1: Registrar un nuevo usuario
-        var usuario = new DUsuario("12345678B", "Ana", "López", "Calle Luna 34", "611301025", "ana@gmail.com", false, "suClave1234");
-        var registroRespuesta = restTemplate.postForEntity("/sociosclub/usuarios", usuario, Void.class);
-        assertThat(registroRespuesta.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+    void testBorrarSolicitud() {
+        // Crear actividad y solicitud previo al borrado
+        var actividad = new DActividad(0,
+                "Título de prueba", "Descripción de prueba", 20.0, 10,
+                LocalDate.now().plusDays(10), LocalDate.now(), LocalDate.now().plusMonths(1)
+        );
 
-        // Paso 2: Marcar la cuota como pagada
-        var respuestaPago = adminRestTemplate.put("/sociosclub/usuarios/{dni}/pagoCuota", null, "12345678B");
-        assertThat(respuestaPago.getStatusCode()).isEqualTo(HttpStatus.OK);
+        // Eliminar la solicitud
+        //long idSolicitud = actividad.; // Obtener ID dinámico
+        //restTemplate.delete("/solicitudes/{idSolicitud}", idSolicitud);
 
         // Paso 3: Verificar que la cuota ha sido marcada como pagada
         var respuestaUsuario = adminRestTemplate.getForEntity("/sociosclub/usuarios/{dni}", DUsuario.class, "12345678B");
@@ -192,36 +196,36 @@ public class TestControladorSociosClub {
     @Test
     @DirtiesContext
     void testBorrarSolicitud() {
-        // Paso 1: Crear una actividad
-        var actividad = new DActividad(0,
-                "Título de prueba", "Descripción de prueba", 20.0, 10,
-                LocalDate.now().plusDays(10), LocalDate.now(), LocalDate.now().plusMonths(1)
-        );
-        var actividadRespuesta = adminRestTemplate.postForEntity("/actividades", actividad, DActividad.class);
-        assertThat(actividadRespuesta.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        var actividadCreada = actividadRespuesta.getBody();
-        assertThat(actividadCreada).isNotNull();
 
-        // Paso 2: Registrar un usuario para realizar la solicitud
+
         var usuario = new DUsuario("12345678B", "Ana", "López", "Calle Luna 34", "611301025", "ana@gmail.com", false, "suClave1234");
         var registroRespuesta = restTemplate.postForEntity("/usuarios", usuario, Void.class);
         assertThat(registroRespuesta.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        // Paso 3: Crear una solicitud
+
+        var actividad = new DActividad(0, "Pilates", "Clase avanzada", 15.0, 10, LocalDate.now().plusDays(7), LocalDate.now(), LocalDate.now().plusDays(10));
+        var actividadRespuesta = adminRestTemplate.postForEntity("/actividades", actividad, DActividad.class);
+        assertThat(actividadRespuesta.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+        var actividadCreada = actividadRespuesta.getBody();
+        assertThat(actividadCreada).isNotNull();
+
+
+        var userAuthenticatedTemplate = restTemplate.withBasicAuth(usuario.dni(), usuario.clave());
         var solicitud = new DSolicitud(actividadCreada.id(), 1, LocalDate.now(), "PENDIENTE", usuario.dni(), actividadCreada.id());
-        var solicitudRespuesta = restTemplate.postForEntity("/solicitudes?idActividad=" + actividadCreada.id(), solicitud, DSolicitud.class);
-        assertThat(solicitudRespuesta.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        var solicitudCreada = solicitudRespuesta.getBody();
-        assertThat(solicitudCreada).isNotNull();
+        var respuesta = userAuthenticatedTemplate.postForEntity("/solicitudes?idActividad=" + actividadCreada.id(), solicitud, Void.class);
+        assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        // Paso 4: Obtener el ID de la solicitud creada para eliminarla
-        long idSolicitud = solicitudCreada.id();
+        long idSolicitud = solicitud.id();
 
-        // Paso 5: Eliminar la solicitud
-        restTemplate.delete("/sociosclub/solicitudes/{idSolicitud}", idSolicitud);
 
-        // Paso 6: Verificar que la solicitud ya no existe
-        var respuesta = adminRestTemplate.getForEntity("/sociosclub/solicitudes/{idSolicitud}", DSolicitud.class, idSolicitud);
-        assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);  // Verifica que la solicitud no exista
+        restTemplate.delete("/solicitudes/{idSolicitud}", idSolicitud);
+
+
+        var respuestaBorrado = restTemplate.getForEntity("/solicitudes/{idSolicitud}", DSolicitud.class, idSolicitud);
+        assertThat(respuestaBorrado.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
+
+
+
 }
