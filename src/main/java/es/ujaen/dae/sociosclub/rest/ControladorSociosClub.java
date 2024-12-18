@@ -116,7 +116,7 @@ public class ControladorSociosClub {
     }
 
     @PostMapping("/solicitudes")
-    public ResponseEntity<Void> nuevaSolicitud(@RequestParam int idActividad, @RequestBody DSolicitud dSolicitud) {
+    public ResponseEntity<DSolicitud> nuevaSolicitud(@RequestParam int idActividad, @RequestBody DSolicitud dSolicitud) {
         try {
             servicioProyecto.crearSolicitud(
                     idActividad,
@@ -163,12 +163,29 @@ public class ControladorSociosClub {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
-
     @GetMapping("/temporadas")
     public ResponseEntity<List<DTemporada>> listarTemporadas() {
         List<Temporada> temporadas = servicioProyecto.buscarTodasTemporadas();
         List<DTemporada> temporadasDTO = temporadas.stream().map(mapeador::dto).toList();
         return ResponseEntity.ok(temporadasDTO);
+    }
+
+    @PutMapping("/usuarios/{dni}/pagoCuota")
+    public ResponseEntity<Void> marcarCuotaPagada(@PathVariable String dni) {
+        servicioProyecto.marcarCuotaPagada(dni);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/solicitudes/{idSolicitud}")
+    public ResponseEntity<Void> modificarSolicitud(@PathVariable long idSolicitud, @RequestBody DSolicitud dSolicitud) {
+        try{
+            servicioProyecto.modificarSolicitud(dSolicitud.idActividad(), idSolicitud, dSolicitud.numAcomp());
+            return ResponseEntity.ok().build();
+        } catch (SolicitudNoRegistrada e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (ActividadNoRegistrada | PlazasNoDisponibles e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 }
 

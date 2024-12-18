@@ -29,8 +29,6 @@ public class TestControladorSociosClub {
                 .rootUri("http://localhost:" + localPort + "/sociosclub");
         restTemplate = new TestRestTemplate(restTemplateBuilder);
 
-
-        // Registrar un administrador predeterminado
         var admin = new DUsuario("12345678Z", "Admin", "Default", "Calle Principal 1", "600111111",
                 "admin@sociosclub.com", true, "superUser");
         var respuestaAdmin = restTemplate.postForEntity("/usuarios", admin, Void.class);
@@ -38,11 +36,7 @@ public class TestControladorSociosClub {
                 !respuestaAdmin.getStatusCode().equals(HttpStatus.CONFLICT)) {
             throw new RuntimeException("No se pudo configurar el administrador predeterminado");
         }
-
-        // Crear un restTemplate con autenticación de administrador
         adminRestTemplate = restTemplate.withBasicAuth(admin.dni(), admin.clave());
-
-
     }
 
     @Test
@@ -155,39 +149,49 @@ public class TestControladorSociosClub {
     @Test
     @DirtiesContext
     void testModificarSolicitud() {
-        var solicitud = new DSolicitud(0, 2, LocalDate.now(), "PENDIENTE", "12345678B",
-                1);
-        long idSolicitud = 1;
+        var usuario = new DUsuario("12345678B", "Ana", "López", "Calle Luna 34", "611301025", "ana@gmail.com", false, "suClave1234");
+        var registroRespuesta = restTemplate.postForEntity("/usuarios", usuario, Void.class);
+        assertThat(registroRespuesta.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        restTemplate.put("/solicitudes/{idSolicitud}", solicitud, idSolicitud);
+        var actividad = new DActividad(0, "Pilates", "Clase avanzada", 15.0, 10, LocalDate.now().plusDays(7), LocalDate.now(), LocalDate.now().plusDays(10));
+        var actividadRespuesta = adminRestTemplate.postForEntity("/actividades", actividad, DActividad.class);
+        assertThat(actividadRespuesta.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        var actividadCreada = actividadRespuesta.getBody();
+        assertThat(actividadCreada).isNotNull();
 
-        var respuesta = restTemplate.getForEntity("/solicitudes/{idSolicitud}", DSolicitud.class, idSolicitud);
+        var userAuthenticatedTemplate = restTemplate.withBasicAuth(usuario.dni(), usuario.clave());
+        var solicitud = new DSolicitud(actividadCreada.id(), 1, LocalDate.now(), "PENDIENTE", usuario.dni(), actividadCreada.id());
+        var solicitudRespuesta = userAuthenticatedTemplate.postForEntity("/solicitudes?idActividad=" + actividadCreada.id(), solicitud, DSolicitud.class);
+        assertThat(solicitudRespuesta.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        var solicitudCreada = solicitudRespuesta.getBody();
+        assertThat(solicitudCreada).isNotNull();
+
+        var solicitudModificada = new DSolicitud(solicitudCreada.id(), 3, LocalDate.now(), "MODIFICADA", usuario.dni(), actividadCreada.id());
+        userAuthenticatedTemplate.put("/solicitudes/{idSolicitud}", solicitudModificada, solicitudModificada.id());
+        var respuesta = userAuthenticatedTemplate.getForEntity("/solicitudes/{idSolicitud}", DSolicitud.class, solicitudModificada.id());
         assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(respuesta.getBody()).isNotNull();
+
+        var solicitudRecuperada = respuesta.getBody();
+        assertThat(solicitudRecuperada).isNotNull();
+        assertThat(solicitudRecuperada.numAcomp()).isEqualTo(3);
+        assertThat(solicitudRecuperada.estado()).isEqualTo("MODIFICADA");
     }
 
-/*
     @Test
     @DirtiesContext
     void testMarcarPagoCuota() {
-        // Paso 1: Registrar un nuevo usuario
         var usuario = new DUsuario("12345678B", "Ana", "López", "Calle Luna 34", "611301025", "ana@gmail.com", false, "suClave1234");
-        var registroRespuesta = restTemplate.postForEntity("/sociosclub/usuarios", usuario, Void.class);
+        var registroRespuesta = restTemplate.postForEntity("/usuarios", usuario, Void.class);
         assertThat(registroRespuesta.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        // Paso 2: Marcar la cuota como pagada
-        var respuestaPago = adminRestTemplate.put("/sociosclub/usuarios/{dni}/pagoCuota", null, "12345678B");
-        assertThat(respuestaPago.getStatusCode()).isEqualTo(HttpStatus.OK);
+        adminRestTemplate.put("/usuarios/{dni}/pagoCuota", null, "12345678B");
 
-        // Paso 3: Verificar que la cuota ha sido marcada como pagada
-        var respuestaUsuario = adminRestTemplate.getForEntity("/sociosclub/usuarios/{dni}", DUsuario.class, "12345678B");
+        var respuestaUsuario = adminRestTemplate.getForEntity("/usuarios/{dni}", DUsuario.class, "12345678B");
         assertThat(respuestaUsuario.getStatusCode()).isEqualTo(HttpStatus.OK);
         var usuarioRecuperado = respuestaUsuario.getBody();
         assertThat(usuarioRecuperado).isNotNull();
-        assertThat(usuarioRecuperado.cuota()).isTrue();  // Verifica que la cuota esté marcada como pagada
+        assertThat(usuarioRecuperado.cuotaPagada()).isTrue();
     }
-*/
-
 
     @Test
     @DirtiesContext

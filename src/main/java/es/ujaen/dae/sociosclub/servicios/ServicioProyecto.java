@@ -151,13 +151,6 @@ public class ServicioProyecto {
         repositorioActividad.actualizar(actividad);
     }
 
-    public void marcarCuota(@NotNull Usuario user) {
-        if (!user.getCuota()) {
-            user.setCuota(true);
-            repositorioUsuario.actualizar(user);
-        }
-    }
-
     @Transactional
     public void asignarPlaza(@NotNull Solicitudes solicitud, @Positive int plazasAsignadas) {
         Actividad actividad = solicitud.getActividad();
@@ -195,5 +188,16 @@ public class ServicioProyecto {
     public Solicitudes buscarSolicitudPorId(long idSolicitud) {
         return repositorioSolicitudes.buscarPorId(idSolicitud)
                 .orElseThrow(SolicitudNoRegistrada::new);
+    }
+
+    @Transactional
+    public void marcarCuotaPagada(String dni) {
+        Usuario usuario = repositorioUsuario.buscarPorDni(dni)
+                .orElseThrow(UsuarioNoRegistrado::new);
+
+        if (!usuario.getCuota()) {
+            usuario.setCuota(true);
+            repositorioUsuario.actualizar(usuario);
+        }
     }
 }
