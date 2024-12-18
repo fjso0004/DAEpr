@@ -15,8 +15,8 @@ public class Mapeador {
     private RepositorioUsuario repositorioUsuario;
     @Autowired
     private RepositorioActividad repositorioActividad;
-    //@Autowired
-    //PasswordEncoder codificadorClaves;
+    @Autowired
+    PasswordEncoder codificadorClaves;
 
 
     public DUsuario dto(Usuario usuario) {

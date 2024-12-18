@@ -51,16 +51,21 @@ public class TestControladorSociosClub {
     @Test
     @DirtiesContext
     void testNuevoUsuario() {
-        var usuario = new DUsuario("12345678A", "Pedro", "Gómez", "Calle Real 12", "611203025", "pedro@gmail.com", false, "miClave12341");
+        var usuario = new DUsuario("12345678A", "Pedro", "Gómez", "Calle Real 12", "611203025", "pedro@gmail.com",
+                false, "miClave12341");
         var respuesta = restTemplate.postForEntity("/usuarios", usuario, Void.class);
 
         assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
         respuesta = restTemplate.postForEntity("/usuarios", usuario, Void.class);
         assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
 
-        var respuestaLogin = restTemplate.getForEntity("/usuarios/{dni}?clave={clave}", DUsuario.class, usuario.dni(), usuario.clave());
+        var respuestaLogin = restTemplate.withBasicAuth(usuario.dni(), usuario.clave()).getForEntity(
+                "/usuarios/{dni}", DUsuario.class, usuario.dni());
+
+          //      getForEntity("/usuarios/{dni}?clave={clave}", DUsuario.class, usuario.dni(), usuario.clave());
         assertThat(respuestaLogin.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(respuestaLogin.getBody()).isEqualTo(usuario);
+        assertThat(respuestaLogin.getBody().dni()).isEqualTo(usuario.dni());
     }
 
     @Test

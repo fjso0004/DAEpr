@@ -44,6 +44,7 @@ public class ServicioProyecto {
             "-",
             "659123456",
             "admin@sociosclub.es",
+            //"$2a$10$ChZT8plXEHPcqSS0F6ExKefCGxRr6xELvbpKPOkfF7zZGxgiM4QCS]",    //Clave codificada
             new BCryptPasswordEncoder().encode("SuperUser"), // Contraseña codificada
             true
     );
