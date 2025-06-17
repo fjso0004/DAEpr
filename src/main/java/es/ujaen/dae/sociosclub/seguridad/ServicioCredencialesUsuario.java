@@ -19,10 +19,13 @@ public class ServicioCredencialesUsuario implements UserDetailsService {
     public UserDetails loadUserByUsername(String dni) throws UsernameNotFoundException {
         Usuario usuario = servicioProyecto.buscarUsuarioPorDni(dni)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
-
-        return User.withUsername(usuario.getDni())
-                .password(usuario.getClave())
-                .roles(usuario.getDni().equals("12345678Z") ? "ADMIN" : "USUARIO")
-                .build();
+        User.UserBuilder builder = User.withUsername(usuario.getDni())
+                .password(usuario.getClave()); // ya codificada
+        if (usuario.isAdministrador()) {
+            builder.roles("ADMIN", "USUARIO");
+        } else {
+            builder.roles("USUARIO");
+        }
+        return builder.build();
     }
 }

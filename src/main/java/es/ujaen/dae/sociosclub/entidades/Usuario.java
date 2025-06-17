@@ -31,59 +31,61 @@ public class Usuario {
 
     boolean cuotaPagada;
 
-    public Usuario(){
+    boolean administrador;  // nuevo campo
 
+    public Usuario() {
     }
 
-    public Usuario(String dni, String nombre, String apellidos, String direccion, String tlf, String email, String clave, boolean cuotaPagada){
+    // Constructor completo: clave en texto plano, luego se codifica en servicio
+    public Usuario(String dni, String nombre, String apellidos, String direccion, String tlf,
+                   String email, String clave, boolean cuotaPagada, boolean administrador) {
         this.dni = dni;
         this.nombre = nombre;
         this.apellidos = apellidos;
+        this.direccion = direccion;
         this.tlf = tlf;
         this.email = email;
-        this.direccion = direccion;
         this.clave = clave;
-        this.cuotaPagada= cuotaPagada;
+        this.cuotaPagada = cuotaPagada;
+        this.administrador = administrador;
     }
 
-public boolean claveValida(String clave){
-    return this.clave.equals(CodificadorMd5.codificar(clave));
-}
-
-public String getDni() {return dni;}
-
-public String getNombre() {
-    return nombre;
-}
-
-public String getApellidos() {
-    return apellidos;
-}
-
-public String getTlf() {
-    return tlf;
-}
-
-public String getDireccion(){
-    return direccion;
-}
-
-public String getEmail() {
-    return email;
-}
-
-public String getClave() {return clave;}
-
-public void setClave(String clave) {
-        this.clave = clave;
+    // Constructor sin administrador: por defecto administrador = false
+    public Usuario(String dni, String nombre, String apellidos, String direccion, String tlf,
+                   String email, String clave, boolean cuotaPagada) {
+        this(dni, nombre, apellidos, direccion, tlf, email, clave, cuotaPagada, false);
     }
 
-public Boolean getCuota() {
-    return cuotaPagada;
-}
+    // Métodos de validación de clave, etc.
+    public boolean claveValida(String clave) {
+        return this.clave.equals(CodificadorMd5.codificar(clave));
+    }
 
-public void setCuota(Boolean cuotaPagada){
-    this.cuotaPagada = cuotaPagada;
-}
+    // Getters y setters
+    public String getDni() { return dni; }
+    public void setDni(String dni) { this.dni = dni; }
 
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+
+    public String getApellidos() { return apellidos; }
+    public void setApellidos(String apellidos) { this.apellidos = apellidos; }
+
+    public String getDireccion() { return direccion; }
+    public void setDireccion(String direccion) { this.direccion = direccion; }
+
+    public String getTlf() { return tlf; }
+    public void setTlf(String tlf) { this.tlf = tlf; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getClave() { return clave; }
+    public void setClave(String clave) { this.clave = clave; }
+
+    public boolean isCuotaPagada() { return cuotaPagada; }
+    public void setCuotaPagada(boolean cuotaPagada) { this.cuotaPagada = cuotaPagada; }
+
+    public boolean isAdministrador() { return administrador; }
+    public void setAdministrador(boolean administrador) { this.administrador = administrador; }
 }

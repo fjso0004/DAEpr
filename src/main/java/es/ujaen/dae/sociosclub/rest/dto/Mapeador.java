@@ -20,13 +20,35 @@ public class Mapeador {
 
 
     public DUsuario dto(Usuario usuario) {
-        return new DUsuario(usuario.getDni(), usuario.getNombre(), usuario.getApellidos(),
-                usuario.getDireccion(), usuario.getTlf(), usuario.getEmail(), usuario.getCuota(), usuario.getClave());
+        // No exponer la clave real: usamos empty o null según convención
+        String claveResponse = "";
+        return new DUsuario(
+                usuario.getDni(),
+                usuario.getNombre(),
+                usuario.getApellidos(),
+                usuario.getDireccion(),
+                usuario.getTlf(),
+                usuario.getEmail(),
+                usuario.isAdministrador(),
+                usuario.isCuotaPagada(),
+                claveResponse
+        );
     }
 
     public Usuario entidad(DUsuario dUsuario) {
-        return new Usuario(dUsuario.dni(), dUsuario.nombre(), dUsuario.apellidos(),
-                dUsuario.direccion(), dUsuario.tlf(), dUsuario.email(), dUsuario.clave(), dUsuario.cuotaPagada());
+        // El constructor de Usuario que definimos ahora es:
+        // Usuario(String dni, String nombre, String apellidos, String direccion, String tlf, String email, String clave, boolean administrador, boolean cuotaPagada)
+        return new Usuario(
+                dUsuario.dni(),
+                dUsuario.nombre(),
+                dUsuario.apellidos(),
+                dUsuario.direccion(),
+                dUsuario.tlf(),
+                dUsuario.email(),
+                dUsuario.clave(),
+                dUsuario.cuotaPagada(),
+                dUsuario.administrador()
+        );
     }
 
     public DActividad dto(Actividad actividad) {
@@ -81,5 +103,21 @@ public class Mapeador {
 
     public Temporada entidad(DTemporada dTemporada) {
         return new Temporada(dTemporada.anio());
+    }
+
+    public DUsuario dtoDeUsuario(Usuario u) {
+        // No exponer la clave real en la respuesta; usar empty o null según convención
+        String claveResponse = "";
+        return new DUsuario(
+                u.getDni(),
+                u.getNombre(),
+                u.getApellidos(),
+                u.getDireccion(),
+                u.getTlf(),
+                u.getEmail(),
+                u.isAdministrador(),
+                u.isCuotaPagada(),
+                claveResponse
+        );
     }
 }

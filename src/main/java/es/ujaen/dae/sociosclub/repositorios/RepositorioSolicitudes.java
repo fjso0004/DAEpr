@@ -25,13 +25,14 @@ public class RepositorioSolicitudes {
         }
         return Optional.ofNullable(solicitud);
     }
+
     public List<Solicitudes> buscarPorActividadId(long actividadId) {
         return em.createQuery("SELECT s FROM Solicitudes s WHERE s.actividad.id = :actividadId", Solicitudes.class)
                 .setParameter("actividadId", actividadId)
                 .getResultList();
     }
 
-    public List<Solicitudes> listarSolicitudesPorActividad(int idActividad) {
+    public List<Solicitudes> listarSolicitudesPorActividad(long idActividad) {
         return em.createQuery("SELECT s FROM Solicitudes s WHERE s.actividad.id = :idActividad", Solicitudes.class)
                 .setParameter("idActividad", idActividad)
                 .getResultList();

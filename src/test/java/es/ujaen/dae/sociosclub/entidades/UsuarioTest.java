@@ -25,13 +25,13 @@ class UsuarioTest {
         assertEquals("600123456", usuario.getTlf());
         assertEquals("juan@ejemplo.com", usuario.getEmail());
         assertEquals("password123", usuario.getClave());
-        assertFalse(usuario.getCuota(), "La cuota debería estar sin pagar inicialmente.");
+        assertFalse(usuario.isCuotaPagada(), "La cuota debería estar sin pagar inicialmente.");
     }
 
     @Test
     void testModificarCuota() {
-        usuario.setCuota(true);
-        assertTrue(usuario.getCuota(), "La cuota debería estar pagada después de modificarla.");
+        usuario.setCuotaPagada(true);
+        assertTrue(usuario.isCuotaPagada(), "La cuota debería estar pagada después de modificarla.");
     }
 
     @Test

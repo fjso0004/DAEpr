@@ -40,7 +40,7 @@ public class Solicitudes {
         this.num_acomp = num_acomp;
         this.fechaSolicitud = LocalDate.now();
 
-        if (usuario.getCuota() && actividad.getNumPlazas() >= (1 + num_acomp)) {
+        if (usuario.isCuotaPagada() && actividad.getNumPlazas() >= (1 + num_acomp)) {
             this.estado = EstadoSolicitud.ACEPTADA;
         } else {
             this.estado = EstadoSolicitud.PENDIENTE;

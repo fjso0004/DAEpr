@@ -8,7 +8,7 @@ public class Temporada {
     @Id
     private int anio;
 
-    @OneToMany
+    @OneToMany(mappedBy = "temporada", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Actividad> actividades = new ArrayList<>();
 
     public Temporada() {

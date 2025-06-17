@@ -28,7 +28,7 @@ class SolicitudesTest {
         assertEquals(usuario, solicitud.getUsuario(), "El usuario de la solicitud no coincide.");
 
         // Verifica el estado en función de la cuota del usuario
-        if (usuario.getCuota()) {
+        if (usuario.isCuotaPagada()) {
             assertEquals(Solicitudes.EstadoSolicitud.ACEPTADA, solicitud.getEstado(),
                     "El estado de la solicitud debería ser ACEPTADA para usuarios con la cuota pagada.");
         } else {
